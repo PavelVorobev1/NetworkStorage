@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="TOP_CENTER">
+         <children>
+            <Label text="Client">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <TableView maxWidth="1.7976931348623157E308">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" cache="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="100.0" spacing="120.0">
+         <children>
+            <Button fx:id="sendButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Отправить">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="downloadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Скачать" />
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </VBox>
+      <VBox alignment="TOP_CENTER">
+         <children>
+            <Label text="Server">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <TableView maxWidth="1.7976931348623157E308">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+              </columns>
+            </TableView>
+         </children>
+      </VBox>
+   </children>
+</HBox>
