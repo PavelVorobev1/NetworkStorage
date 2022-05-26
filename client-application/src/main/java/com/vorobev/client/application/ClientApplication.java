@@ -1,4 +1,4 @@
-package com.vorobev.clientapplication;
+package com.vorobev.client.application;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

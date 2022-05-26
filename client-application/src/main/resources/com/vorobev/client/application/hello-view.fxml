@@ -5,23 +5,23 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+<HBox fx:controller="com.vorobev.client.application.ClientController" minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+      <VBox fx:id="clientVBox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
          <children>
-            <Label text="Client">
+            <Label fx:id="labelClient" text="Client">
                <font>
                   <Font size="16.0" />
                </font>
             </Label>
-            <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+            <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn maxWidth="1.7976931348623157E308" prefWidth="75.0" text="C2" />
               </columns>
             </TableView>
          </children>
       </VBox>
-      <VBox alignment="CENTER" cache="true" maxHeight="1.7976931348623157E308" maxWidth="100.0" spacing="120.0" HBox.hgrow="ALWAYS">
+      <VBox fx:id="buttonVBox" alignment="CENTER" cache="true" maxHeight="1.7976931348623157E308" maxWidth="100.0" spacing="120.0" HBox.hgrow="ALWAYS">
          <children>
             <Button fx:id="sendButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Отправить">
                <VBox.margin>
@@ -34,14 +34,14 @@
             <Insets />
          </opaqueInsets>
       </VBox>
-      <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+      <VBox fx:id="serverVBox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
          <children>
-            <Label text="Server">
+            <Label fx:id="labelServer" text="Server">
                <font>
                   <Font size="16.0" />
                </font>
             </Label>
-            <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+            <TableView fx:id="serverTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn maxWidth="1.7976931348623157E308" text="C1" />
               </columns>

@@ -3,6 +3,6 @@ module com.example.clientapplication {
     requires javafx.fxml;
 
 
-    opens com.vorobev.clientapplication to javafx.fxml;
-    exports com.vorobev.clientapplication;
+    opens com.vorobev.client.application to javafx.fxml;
+    exports com.vorobev.client.application;
 }
