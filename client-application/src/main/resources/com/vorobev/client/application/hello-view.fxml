@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox fx:controller="com.vorobev.client.application.ClientController" minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+<HBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.ClientController">
    <children>
       <VBox fx:id="clientVBox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
          <children>
@@ -15,20 +15,18 @@
                </font>
             </Label>
             <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
-              <columns>
-                <TableColumn maxWidth="1.7976931348623157E308" prefWidth="75.0" text="C2" />
-              </columns>
+
             </TableView>
          </children>
       </VBox>
       <VBox fx:id="buttonVBox" alignment="CENTER" cache="true" maxHeight="1.7976931348623157E308" maxWidth="100.0" spacing="120.0" HBox.hgrow="ALWAYS">
          <children>
-            <Button fx:id="sendButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Отправить">
+            <Button fx:id="sendButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonSendAction" text="Отправить &gt;">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
             </Button>
-            <Button fx:id="downloadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Скачать" />
+            <Button fx:id="downloadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonDownloadAction" text="Скачать &lt;" />
          </children>
          <opaqueInsets>
             <Insets />
@@ -42,9 +40,7 @@
                </font>
             </Label>
             <TableView fx:id="serverTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
-              <columns>
-                <TableColumn maxWidth="1.7976931348623157E308" text="C1" />
-              </columns>
+
             </TableView>
          </children>
       </VBox>
