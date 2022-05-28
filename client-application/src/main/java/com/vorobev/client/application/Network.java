@@ -30,6 +30,14 @@ public class Network {
         return inputStream.readUTF();
     }
 
+    public int readInt() throws IOException {
+        return inputStream.readInt();
+    }
+
+    public long readLong() throws IOException {
+        return inputStream.readLong();
+    }
+
     public void writeCommand(String message) throws IOException {
         outputStream.writeUTF(message);
         outputStream.flush();
