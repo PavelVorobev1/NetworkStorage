@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NetworkStorage.iml" filepath="$PROJECT_DIR$/NetworkStorage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/client-application/client-application.iml" filepath="$PROJECT_DIR$/client-application/client-application.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
     </modules>
   </component>
 </project>
