@@ -26,6 +26,14 @@ public class Network {
         }
     }
 
+    public DataInputStream getInputStream() {
+        return inputStream;
+    }
+
+    public DataOutputStream getOutputStream() {
+        return outputStream;
+    }
+
     public String readCommand() throws IOException {
         return inputStream.readUTF();
     }

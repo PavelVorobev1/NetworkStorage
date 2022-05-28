@@ -3,16 +3,11 @@ package com.vorobev.server;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ApplicationHandler implements Runnable {
 
     private final String serverFilesDir = "server-files";
-    
+
     private DataInputStream input;
     private DataOutputStream output;
 
@@ -20,12 +15,40 @@ public class ApplicationHandler implements Runnable {
         try {
             input = new DataInputStream(socket.getInputStream());
             output = new DataOutputStream(socket.getOutputStream());
+            System.out.println("Клиент подключился к серверу");
             sendListOfFiles();
         } catch (IOException e) {
             System.err.println("Клиенту не удалось подключится к серверу");
             e.printStackTrace();
         }
     }
+
+    public void run() {
+        byte[] buf = new byte[256];
+        try {
+            while (true) {
+                String command = input.readUTF();
+                System.out.println("Command: " + command);
+                if (command.equals("/upload-file")) {
+                    String fileName = input.readUTF();
+                    long len = input.readLong();
+                    File file = Path.of(serverFilesDir).resolve(fileName).toFile();
+                    try(FileOutputStream fos = new FileOutputStream(file)) {
+                        for (int i = 0; i < (len + 255) / 256; i++) {
+                            int read = input.read(buf);
+                            fos.write(buf, 0 , read);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    sendListOfFiles();
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Потеря соеденения");
+        }
+    }
+
 
 
     private void sendListOfFiles(){
@@ -48,23 +71,10 @@ public class ApplicationHandler implements Runnable {
 
 
 
-    private int getFilesInt (File dir){
+
+    private int getFilesInt(File dir){
         String[] list = dir.list();
         return list.length;
     }
 
-
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                String command = input.readUTF();
-                System.out.println("Command:" + command);
-                output.writeUTF(command);
-                output.flush();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

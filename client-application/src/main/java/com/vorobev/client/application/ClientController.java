@@ -1,6 +1,5 @@
 package com.vorobev.client.application;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -9,7 +8,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,7 +21,6 @@ import java.util.stream.Collectors;
 
 public class ClientController implements Initializable {
 
-
     @FXML
     public TableView<FileInfoClient> clientTable;
     @FXML
@@ -28,6 +29,10 @@ public class ClientController implements Initializable {
     public Button uploadButton;
     @FXML
     public Button downloadButton;
+
+    String homeDir = "client-files";
+
+    private byte[] buf;
 
     private Network network;
 
@@ -44,15 +49,17 @@ public class ClientController implements Initializable {
     }
 
     private void readLoop() {
+        createListServer();
         try {
             while (true) {
                 String command = network.readCommand();
                 if (command.equals("/list-server-files")) {
+                    serverTable.getItems().clear();
                     FileInfoServer[] fileInfoServer = new FileInfoServer[network.readInt()];
                     for (int i = 0; i < fileInfoServer.length; i++) {
-                        fileInfoServer[i] = new FileInfoServer(network.readCommand(),network.readLong());
+                        fileInfoServer[i] = new FileInfoServer(network.readCommand(), network.readLong());
                     }
-                    createListServer();
+
                     serverTable.getItems().addAll(fileInfoServer);
                 }
             }
@@ -124,6 +131,7 @@ public class ClientController implements Initializable {
 
     private void getFileClient(Path path) {
         try {
+            buf = new byte[256];
             clientTable.getItems().clear();
             clientTable.getItems().addAll(Files.list(path).map(FileInfoClient::new).collect(Collectors.toList()));
             clientTable.sort();
@@ -138,7 +146,25 @@ public class ClientController implements Initializable {
 
     }
 
-    public void buttonSendAction(ActionEvent actionEvent) {
+    public void buttonUploadAction(ActionEvent actionEvent) {
 
+        try {
+            network.getOutputStream().writeUTF("/upload-file");
+            String file = clientTable.getSelectionModel().getSelectedItem().getFileName();
+            network.getOutputStream().writeUTF(file);
+            File toSend = Path.of(homeDir).resolve(file).toFile();
+            network.getOutputStream().writeLong(toSend.length());
+            try (FileInputStream fis = new FileInputStream(toSend)) {
+                while (fis.available() > 0) {
+                    int read = fis.read(buf);
+                    network.getOutputStream().write(buf, 0, read);
+                }
+            }
+            network.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
     }
+
 }

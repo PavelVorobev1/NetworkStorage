@@ -21,7 +21,7 @@
       </VBox>
       <VBox fx:id="buttonVBox" alignment="CENTER" cache="true" maxHeight="1.7976931348623157E308" maxWidth="100.0" spacing="120.0" HBox.hgrow="ALWAYS">
          <children>
-            <Button fx:id="uploadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonSendAction" text="Отправить &gt;">
+            <Button fx:id="uploadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonUploadAction" text="Отправить &gt;">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
