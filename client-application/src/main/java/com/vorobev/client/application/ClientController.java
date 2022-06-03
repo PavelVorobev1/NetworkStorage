@@ -11,7 +11,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 public class ClientController implements Initializable {
 
     @FXML
-    public TableView<FileInfoClient> clientTable;
+    public TableView<FileInfo> clientTable;
     @FXML
     public TableView serverTable;
     @FXML
@@ -55,9 +54,9 @@ public class ClientController implements Initializable {
                 String command = network.readCommand();
                 if (command.equals("/list-server-files")) {
                     serverTable.getItems().clear();
-                    FileInfoServer[] fileInfoServer = new FileInfoServer[network.readInt()];
+                    FileInfo[] fileInfoServer = new FileInfo[network.readInt()];
                     for (int i = 0; i < fileInfoServer.length; i++) {
-                        fileInfoServer[i] = new FileInfoServer(network.readCommand(), network.readLong());
+                        fileInfoServer[i] = new FileInfo(network.readCommand(), network.readLong());
                     }
 
                     serverTable.getItems().addAll(fileInfoServer);
@@ -72,16 +71,16 @@ public class ClientController implements Initializable {
     }
 
     private void createListServer() {
-        TableColumn<FileInfoServer, String> filenameColumnServer = new TableColumn<>("Имя файла");
+        TableColumn<FileInfo, String> filenameColumnServer = new TableColumn<>("Имя файла");
         filenameColumnServer.setCellValueFactory(new PropertyValueFactory<>("fileName"));
         filenameColumnServer.setPrefWidth(150);
 
-        TableColumn<FileInfoClient, Long> fileSizeColumnServer = new TableColumn<>("Размер файла");
+        TableColumn<FileInfo, Long> fileSizeColumnServer = new TableColumn<>("Размер файла");
         fileSizeColumnServer.setCellValueFactory(new PropertyValueFactory<>("sizeFile"));
         fileSizeColumnServer.setPrefWidth(100);
 
         fileSizeColumnServer.setCellFactory(column -> {
-            return new TableCell<FileInfoClient, Long>() {
+            return new TableCell<FileInfo, Long>() {
                 @Override
                 protected void updateItem(Long item, boolean empty) {
                     super.updateItem(item, empty);
@@ -101,16 +100,16 @@ public class ClientController implements Initializable {
 
 
     private void createListClient() {
-        TableColumn<FileInfoClient, String> filenameColumnClient = new TableColumn<>("Имя файла");
+        TableColumn<FileInfo, String> filenameColumnClient = new TableColumn<>("Имя файла");
         filenameColumnClient.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getFileName()));
         filenameColumnClient.setPrefWidth(150);
 
-        TableColumn<FileInfoClient, Long> fileSizeColumnClient = new TableColumn<>("Размер файла");
+        TableColumn<FileInfo, Long> fileSizeColumnClient = new TableColumn<>("Размер файла");
         fileSizeColumnClient.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getSizeFile()));
         fileSizeColumnClient.setPrefWidth(100);
 
         fileSizeColumnClient.setCellFactory(column -> {
-            return new TableCell<FileInfoClient, Long>() {
+            return new TableCell<FileInfo, Long>() {
                 @Override
                 protected void updateItem(Long item, boolean empty) {
                     super.updateItem(item, empty);
@@ -133,7 +132,7 @@ public class ClientController implements Initializable {
         try {
             buf = new byte[256];
             clientTable.getItems().clear();
-            clientTable.getItems().addAll(Files.list(path).map(FileInfoClient::new).collect(Collectors.toList()));
+            clientTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
             clientTable.sort();
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось считать файлы", ButtonType.OK);

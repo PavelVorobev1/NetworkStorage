@@ -83,11 +83,11 @@ public class NioServer {
                 stringBuilder.delete(0, stringBuilder.length());
                 showDir(stringBuilder);
             }
-            if (text.startsWith("cd path")) {
+            if (text.startsWith("cd")) {
                 try {
                     stringBuilder.delete(0, stringBuilder.length());
                     Path path = Path.of(pathDir.toString());
-                    text = text.substring(8,text.length() - 2);
+                    text = text.substring(2,text.length() - 2);
                     pathDir = path.resolve(text.trim());
                     showDir(stringBuilder);
                 } catch (NullPointerException e){
@@ -95,8 +95,8 @@ public class NioServer {
                     channel.write(ByteBuffer.wrap("Неверный путь к файлу".getBytes(StandardCharsets.UTF_8)));
                 }
             }
-            if (text.startsWith("cat file")) {
-                text = text.substring(8,text.length() - 2);
+            if (text.startsWith("cat")) {
+                text = text.substring(3,text.length() - 2);
                 List<String> textTheFile = Files.readAllLines(pathDir.resolve(text.trim()));
                 for (String line : textTheFile) {
                     stringBuilder.append(line);

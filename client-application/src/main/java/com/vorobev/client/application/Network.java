@@ -13,9 +13,9 @@ public class Network {
     private DataOutputStream outputStream;
     
     public Network(int port){
-        Socket socket = null;
+
         try {
-            socket = new Socket("localhost",port);
+            Socket socket = new Socket("localhost",port);
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
