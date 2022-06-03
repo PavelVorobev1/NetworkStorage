@@ -54,7 +54,6 @@ public class ApplicationHandler implements Runnable {
     private void sendListOfFiles(){
         try {
             output.writeUTF("/list-server-files");
-
             File dir = new File(serverFilesDir);
             output.writeInt(getFilesInt(dir));
             for (File file : dir.listFiles() ) {
@@ -65,6 +64,7 @@ public class ApplicationHandler implements Runnable {
                 }
             }
         } catch (IOException e) {
+            System.err.println("Не удалось отправить информацию о файлах");
             e.printStackTrace();
         }
     }

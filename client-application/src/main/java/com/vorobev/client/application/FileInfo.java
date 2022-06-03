@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileInfoServer {
+public class FileInfo {
     private String fileName;
     private long sizeFile;
 
@@ -24,9 +24,18 @@ public class FileInfoServer {
         this.sizeFile = sizeFile;
     }
 
-    public FileInfoServer(String fileName,Long sizeFile) {
-            this.fileName = fileName;
-            this.sizeFile = sizeFile;
+    public FileInfo(String fileName,Long sizeFile) {
+        this.fileName = fileName;
+        this.sizeFile = sizeFile;
     }
 
+    public FileInfo(Path path) {
+        try {
+            this.fileName = path.getFileName().toString();
+            this.sizeFile = Files.size(path);
+        } catch (IOException e) {
+            System.err.println("Не удалось получить информацию о файле");
+            e.printStackTrace();
+        }
+    }
 }
