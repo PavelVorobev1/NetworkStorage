@@ -1,5 +1,9 @@
 package com.vorobev.client.application;
 
+import com.vorobev.cloud.CloudMessage;
+import com.vorobev.cloud.FileMessage;
+import com.vorobev.cloud.FileRequest;
+import com.vorobev.cloud.ListFiles;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -8,13 +12,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -51,51 +56,63 @@ public class ClientController implements Initializable {
         createListServer();
         try {
             while (true) {
-                String command = network.readCommand();
-                if (command.equals("/list-server-files")) {
+                CloudMessage command = network.read();
+                if (command instanceof ListFiles) {
+                    ListFiles listFiles = (ListFiles) command;
                     serverTable.getItems().clear();
-                    FileInfo[] fileInfoServer = new FileInfo[network.readInt()];
-                    for (int i = 0; i < fileInfoServer.length; i++) {
-                        fileInfoServer[i] = new FileInfo(network.readCommand(), network.readLong());
+                    List<String> fileInfoServer = listFiles.getFiles();
+                    ArrayList<FileInfo> fileInfoArray = new ArrayList<>();
+                    for (String file : fileInfoServer) {
+                        fileInfoArray.add(new FileInfo(file));
                     }
 
-                    serverTable.getItems().addAll(fileInfoServer);
+                    serverTable.getItems().addAll(fileInfoArray);
+                } else if (command instanceof FileMessage) {
+                    FileMessage fileMessage = (FileMessage) command;
+                    Path current = Path.of(homeDir).resolve(fileMessage.getName());
+                    Files.write(current, fileMessage.getData());
+                    getFileClient(Paths.get(".", "client-files"));
+
+
+
                 }
             }
 
         } catch (IOException e) {
             System.err.println("Connection lost");
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-
     }
+
 
     private void createListServer() {
         TableColumn<FileInfo, String> filenameColumnServer = new TableColumn<>("Имя файла");
         filenameColumnServer.setCellValueFactory(new PropertyValueFactory<>("fileName"));
         filenameColumnServer.setPrefWidth(150);
 
-        TableColumn<FileInfo, Long> fileSizeColumnServer = new TableColumn<>("Размер файла");
-        fileSizeColumnServer.setCellValueFactory(new PropertyValueFactory<>("sizeFile"));
-        fileSizeColumnServer.setPrefWidth(100);
+//        TableColumn<FileInfo, Long> fileSizeColumnServer = new TableColumn<>("Размер файла");
+//        fileSizeColumnServer.setCellValueFactory(new PropertyValueFactory<>("sizeFile"));
+//        fileSizeColumnServer.setPrefWidth(100);
+//
+//        fileSizeColumnServer.setCellFactory(column -> {
+//            return new TableCell<FileInfo, Long>() {
+//                @Override
+//                protected void updateItem(Long item, boolean empty) {
+//                    super.updateItem(item, empty);
+//                    if (item == null || empty) {
+//                        setText(null);
+//                        setStyle("");
+//                    } else {
+//                        String text = String.format("%,d bytes", item);
+//                        setText(text);
+//                    }
+//                }
+//            };
+//        });
 
-        fileSizeColumnServer.setCellFactory(column -> {
-            return new TableCell<FileInfo, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item == null || empty) {
-                        setText(null);
-                        setStyle("");
-                    } else {
-                        String text = String.format("%,d bytes", item);
-                        setText(text);
-                    }
-                }
-            };
-        });
-
-        serverTable.getColumns().addAll(filenameColumnServer, fileSizeColumnServer);
+        serverTable.getColumns().addAll(filenameColumnServer);
     }
 
 
@@ -142,27 +159,26 @@ public class ClientController implements Initializable {
     }
 
     public void buttonDownloadAction(ActionEvent actionEvent) {
-
+        try {
+            String file = serverTable.getSelectionModel().getSelectedItem().toString();
+            network.writeCommand(new FileRequest(file));
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось скачать файл.", ButtonType.OK);
+            alert.showAndWait();
+            System.err.println("Не удалось скачать файл.");
+            e.printStackTrace();
+        }
     }
 
     public void buttonUploadAction(ActionEvent actionEvent) {
-
         try {
-            network.getOutputStream().writeUTF("/upload-file");
             String file = clientTable.getSelectionModel().getSelectedItem().getFileName();
-            network.getOutputStream().writeUTF(file);
-            File toSend = Path.of(homeDir).resolve(file).toFile();
-            network.getOutputStream().writeLong(toSend.length());
-            try (FileInputStream fis = new FileInputStream(toSend)) {
-                while (fis.available() > 0) {
-                    int read = fis.read(buf);
-                    network.getOutputStream().write(buf, 0, read);
-                }
-            }
-            network.getOutputStream().flush();
+            network.writeCommand(new FileMessage(Path.of(homeDir).resolve(file)));
         } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл.", ButtonType.OK);
+            alert.showAndWait();
+            System.err.println("Не удалось отправить файл.");
             e.printStackTrace();
-
         }
     }
 

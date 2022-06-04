@@ -12,21 +12,22 @@ public class FileInfo {
         return fileName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
     public long getSizeFile() {
         return sizeFile;
     }
 
-    public void setSizeFile(long sizeFile) {
-        this.sizeFile = sizeFile;
+//    public FileInfo(String fileName, long l) {
+//        this.fileName = fileName;
+//        this.sizeFile = sizeFile;
+//    }
+
+    public FileInfo(String fileName) {
+        this.fileName = fileName;
     }
 
-    public FileInfo(String fileName,Long sizeFile) {
-        this.fileName = fileName;
-        this.sizeFile = sizeFile;
+    @Override
+    public String toString() {
+        return fileName;
     }
 
     public FileInfo(Path path) {

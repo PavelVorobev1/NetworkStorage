@@ -17,7 +17,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
     private Path currentDir;
 
     public CloudFileHandler() {
-        currentDir = Path.of("server_files");
+        currentDir = Path.of("server.home");
     }
 
     @Override
@@ -27,11 +27,13 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CloudMessage cloudMessage) throws Exception {
-//        if (cloudMessage instanceof FileRequest fileRequest) {
-//            ctx.writeAndFlush(new FileMessage(currentDir.resolve(fileRequest.getName())));
-//        } else if (cloudMessage instanceof FileMessage fileMessage) {
-//            Files.write(currentDir.resolve(fileMessage.getName()), fileMessage.getData());
-//            ctx.writeAndFlush(new ListFiles(currentDir));
-//        }
+        if (cloudMessage instanceof FileRequest) {
+            FileRequest fileRequest = (FileRequest) cloudMessage;
+            ctx.writeAndFlush(new FileMessage(currentDir.resolve(fileRequest.getName())));
+        } else if (cloudMessage instanceof FileMessage ) {
+            FileMessage fileMessage = (FileMessage) cloudMessage;
+            Files.write(currentDir.resolve(fileMessage.getName()), fileMessage.getData());
+            ctx.writeAndFlush(new ListFiles(currentDir));
+        }
     }
 }

@@ -4,7 +4,6 @@ package com.vorobev.netty;
 import com.vorobev.netty.handler.CloudFileHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -32,9 +31,9 @@ public class CloudServer {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline().addLast(
-                                    (ChannelHandler) new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                                    (ChannelHandler) new ObjectEncoder(),
-                                    (ChannelHandler) new CloudFileHandler()
+                                    new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
+                                    new ObjectEncoder(),
+                                    new CloudFileHandler()
                             );
                         }
                     });
