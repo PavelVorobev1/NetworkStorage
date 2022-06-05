@@ -14,6 +14,12 @@
                   <Font size="16.0" />
                </font>
             </Label>
+            <HBox alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#buttonClientPathIn" text="Открыть папку" />
+                  <Button mnemonicParsing="false" onAction="#buttonClientPathUp" text="Выйти из папки" />
+               </children>
+            </HBox>
             <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
 
             </TableView>
@@ -21,12 +27,12 @@
       </VBox>
       <VBox fx:id="buttonVBox" alignment="CENTER" cache="true" maxHeight="1.7976931348623157E308" maxWidth="100.0" spacing="120.0" HBox.hgrow="ALWAYS">
          <children>
-            <Button fx:id="uploadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonUploadAction" text="Отправить &gt;">
+            <Button fx:id="uploadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonUploadAction" text="Отправить &gt;&gt;">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
             </Button>
-            <Button fx:id="downloadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonDownloadAction" text="Скачать &lt;" />
+            <Button fx:id="downloadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonDownloadAction" text="Скачать &lt;&lt;" />
          </children>
          <opaqueInsets>
             <Insets />
@@ -39,6 +45,12 @@
                   <Font size="16.0" />
                </font>
             </Label>
+            <HBox alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#buttonServerPathUp" text="Открыть папку" />
+                  <Button mnemonicParsing="false" onAction="#buttonServerPathIn" text="Выйти из папки" />
+               </children>
+            </HBox>
             <TableView fx:id="serverTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
 
             </TableView>

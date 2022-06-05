@@ -7,6 +7,7 @@ import java.nio.file.Path;
 public class FileInfo {
     private String fileName;
     private long sizeFile;
+    private Path path;
 
     public String getFileName() {
         return fileName;
@@ -32,11 +33,19 @@ public class FileInfo {
 
     public FileInfo(Path path) {
         try {
+            this.path = path;
             this.fileName = path.getFileName().toString();
             this.sizeFile = Files.size(path);
         } catch (IOException e) {
             System.err.println("Не удалось получить информацию о файле");
             e.printStackTrace();
         }
+    }
+
+    public boolean isDir() {
+        if(Files.isDirectory(path)){
+            return true;
+        }
+        return false;
     }
 }

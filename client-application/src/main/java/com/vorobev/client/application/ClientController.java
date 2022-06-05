@@ -14,10 +14,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -34,9 +32,8 @@ public class ClientController implements Initializable {
     @FXML
     public Button downloadButton;
 
-    String homeDir = "client-files";
-
-    private byte[] buf;
+//    String homeDir = "client-files";
+    Path homeDir = Path.of("client-files");
 
     private Network network;
 
@@ -58,23 +55,12 @@ public class ClientController implements Initializable {
             while (true) {
                 CloudMessage command = network.read();
                 if (command instanceof ListFiles) {
-                    ListFiles listFiles = (ListFiles) command;
-                    serverTable.getItems().clear();
-                    List<String> fileInfoServer = listFiles.getFiles();
-                    ArrayList<FileInfo> fileInfoArray = new ArrayList<>();
-                    for (String file : fileInfoServer) {
-                        fileInfoArray.add(new FileInfo(file));
-                    }
-
-                    serverTable.getItems().addAll(fileInfoArray);
+                    createFileServer((ListFiles) command);
                 } else if (command instanceof FileMessage) {
                     FileMessage fileMessage = (FileMessage) command;
-                    Path current = Path.of(homeDir).resolve(fileMessage.getName());
+                    Path current = homeDir.resolve(fileMessage.getName());
                     Files.write(current, fileMessage.getData());
-                    getFileClient(Paths.get(".", "client-files"));
-
-
-
+                    getFileClient(homeDir);
                 }
             }
 
@@ -84,6 +70,17 @@ public class ClientController implements Initializable {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createFileServer(ListFiles command) {
+        ListFiles listFiles = command;
+        serverTable.getItems().clear();
+        List<String> fileInfoServer = listFiles.getFiles();
+        ArrayList<FileInfo> fileInfoArray = new ArrayList<>();
+        for (String file : fileInfoServer) {
+            fileInfoArray.add(new FileInfo(file));
+        }
+        serverTable.getItems().addAll(fileInfoArray);
     }
 
 
@@ -142,12 +139,11 @@ public class ClientController implements Initializable {
         });
 
         clientTable.getColumns().addAll(filenameColumnClient, fileSizeColumnClient);
-        getFileClient(Paths.get(".", "client-files"));
+        getFileClient(homeDir);
     }
 
     private void getFileClient(Path path) {
         try {
-            buf = new byte[256];
             clientTable.getItems().clear();
             clientTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
             clientTable.sort();
@@ -171,15 +167,42 @@ public class ClientController implements Initializable {
     }
 
     public void buttonUploadAction(ActionEvent actionEvent) {
-        try {
-            String file = clientTable.getSelectionModel().getSelectedItem().getFileName();
-            network.writeCommand(new FileMessage(Path.of(homeDir).resolve(file)));
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл.", ButtonType.OK);
+        if (clientTable.getSelectionModel().getSelectedItem().isDir()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Нельзя отправить папку. Выберите файл", ButtonType.OK);
             alert.showAndWait();
-            System.err.println("Не удалось отправить файл.");
-            e.printStackTrace();
+        }else {
+            try {
+                String file = clientTable.getSelectionModel().getSelectedItem().getFileName();
+                network.writeCommand(new FileMessage(homeDir.resolve(file)));
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл.", ButtonType.OK);
+                alert.showAndWait();
+                System.err.println("Не удалось отправить файл.");
+                e.printStackTrace();
+            }
         }
     }
 
+    public void buttonClientPathIn(ActionEvent actionEvent) {
+        if (!clientTable.getSelectionModel().getSelectedItem().isDir()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Нельзя открыть файл. Выберите папку", ButtonType.OK);
+            alert.showAndWait();
+        } else {
+            homeDir = homeDir.resolve(clientTable.getSelectionModel().getSelectedItem().getFileName());
+            getFileClient(homeDir);
+        }
+    }
+
+    public void buttonClientPathUp(ActionEvent actionEvent) {
+            homeDir = homeDir.resolve("..");
+            getFileClient(homeDir);
+    }
+
+    public void buttonServerPathUp(ActionEvent actionEvent) {
+
+    }
+
+    public void buttonServerPathIn(ActionEvent actionEvent) {
+
+    }
 }
