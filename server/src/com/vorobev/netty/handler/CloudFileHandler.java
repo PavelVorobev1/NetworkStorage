@@ -1,10 +1,7 @@
 package com.vorobev.netty.handler;
 
 
-import com.vorobev.cloud.CloudMessage;
-import com.vorobev.cloud.FileMessage;
-import com.vorobev.cloud.FileRequest;
-import com.vorobev.cloud.ListFiles;
+import com.vorobev.cloud.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -30,9 +27,18 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
         if (cloudMessage instanceof FileRequest) {
             FileRequest fileRequest = (FileRequest) cloudMessage;
             ctx.writeAndFlush(new FileMessage(currentDir.resolve(fileRequest.getName())));
-        } else if (cloudMessage instanceof FileMessage ) {
+        } else if (cloudMessage instanceof FileMessage) {
             FileMessage fileMessage = (FileMessage) cloudMessage;
             Files.write(currentDir.resolve(fileMessage.getName()), fileMessage.getData());
+            ctx.writeAndFlush(new ListFiles(currentDir));
+
+        } else if (cloudMessage instanceof PathUpRequest) {
+            currentDir = currentDir.resolve("..");
+            ctx.writeAndFlush(new ListFiles(currentDir));
+
+        } else if (cloudMessage instanceof PathInRequest) {
+            PathInRequest pathInRequest = (PathInRequest) cloudMessage;
+            currentDir = currentDir.resolve(Path.of(pathInRequest.getPath()));
             ctx.writeAndFlush(new ListFiles(currentDir));
         }
     }

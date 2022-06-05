@@ -31,9 +31,6 @@ public class Network {
         return (CloudMessage) inputStream.readObject();
     }
 
-
-
-
     public void writeCommand(CloudMessage message) throws IOException {
         outputStream.writeObject(message);
         outputStream.flush();

@@ -1,9 +1,6 @@
 package com.vorobev.client.application;
 
-import com.vorobev.cloud.CloudMessage;
-import com.vorobev.cloud.FileMessage;
-import com.vorobev.cloud.FileRequest;
-import com.vorobev.cloud.ListFiles;
+import com.vorobev.cloud.*;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -32,7 +29,7 @@ public class ClientController implements Initializable {
     @FXML
     public Button downloadButton;
 
-//    String homeDir = "client-files";
+    //    String homeDir = "client-files";
     Path homeDir = Path.of("client-files");
 
     private Network network;
@@ -55,7 +52,14 @@ public class ClientController implements Initializable {
             while (true) {
                 CloudMessage command = network.read();
                 if (command instanceof ListFiles) {
-                    createFileServer((ListFiles) command);
+                    ListFiles listFiles = (ListFiles) command;
+                    serverTable.getItems().clear();
+                    List<String> fileInfoServer = listFiles.getFiles();
+                    ArrayList<FileInfo> fileInfoArray = new ArrayList<>();
+                    for (String file : fileInfoServer) {
+                        fileInfoArray.add(new FileInfo(file));
+                    }
+                    serverTable.getItems().addAll(fileInfoArray);
                 } else if (command instanceof FileMessage) {
                     FileMessage fileMessage = (FileMessage) command;
                     Path current = homeDir.resolve(fileMessage.getName());
@@ -72,16 +76,6 @@ public class ClientController implements Initializable {
         }
     }
 
-    private void createFileServer(ListFiles command) {
-        ListFiles listFiles = command;
-        serverTable.getItems().clear();
-        List<String> fileInfoServer = listFiles.getFiles();
-        ArrayList<FileInfo> fileInfoArray = new ArrayList<>();
-        for (String file : fileInfoServer) {
-            fileInfoArray.add(new FileInfo(file));
-        }
-        serverTable.getItems().addAll(fileInfoArray);
-    }
 
 
     private void createListServer() {
@@ -170,7 +164,7 @@ public class ClientController implements Initializable {
         if (clientTable.getSelectionModel().getSelectedItem().isDir()) {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Нельзя отправить папку. Выберите файл", ButtonType.OK);
             alert.showAndWait();
-        }else {
+        } else {
             try {
                 String file = clientTable.getSelectionModel().getSelectedItem().getFileName();
                 network.writeCommand(new FileMessage(homeDir.resolve(file)));
@@ -194,15 +188,35 @@ public class ClientController implements Initializable {
     }
 
     public void buttonClientPathUp(ActionEvent actionEvent) {
-            homeDir = homeDir.resolve("..");
-            getFileClient(homeDir);
+        homeDir = homeDir.resolve("..");
+        getFileClient(homeDir);
     }
 
     public void buttonServerPathUp(ActionEvent actionEvent) {
-
+        try {
+            String path = "..";
+            network.writeCommand(new PathUpRequest(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void buttonServerPathIn(ActionEvent actionEvent) {
+//        FileInfo info = new FileInfo("1");
+//        if (serverTable.getSelectionModel().getSelectedItem().getClass().isInstance(info)) {
+//            Alert alert = new Alert(Alert.AlertType.WARNING, "Нельзя открыть файл. Выберите папку", ButtonType.OK);
+//            alert.showAndWait();
+//        } else {
+        try {
+            String path = serverTable.getSelectionModel().getSelectedItem().toString();
+            network.writeCommand(new PathInRequest(path));
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Нужно выбрать папку", ButtonType.OK);
+            alert.showAndWait();
+            System.err.println("Нужно выбрать папку");
+            e.printStackTrace();
+        }
+//        }
 
     }
 }

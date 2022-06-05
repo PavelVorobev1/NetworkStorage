@@ -47,8 +47,8 @@
             </Label>
             <HBox alignment="CENTER">
                <children>
-                  <Button mnemonicParsing="false" onAction="#buttonServerPathUp" text="Открыть папку" />
-                  <Button mnemonicParsing="false" onAction="#buttonServerPathIn" text="Выйти из папки" />
+                  <Button mnemonicParsing="false" onAction="#buttonServerPathIn" text="Открыть папку" />
+                  <Button mnemonicParsing="false" onAction="#buttonServerPathUp" text="Выйти из папки" />
                </children>
             </HBox>
             <TableView fx:id="serverTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
