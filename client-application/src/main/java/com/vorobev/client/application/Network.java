@@ -1,23 +1,24 @@
 package com.vorobev.client.application;
 
+import com.vorobev.cloud.CloudMessage;
+import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
+import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class Network {
-    private DataInputStream inputStream;
-    private DataOutputStream outputStream;
-    
+    private ObjectDecoderInputStream inputStream;
+    private ObjectEncoderOutputStream outputStream;
+
     public Network(int port){
 
         try {
             Socket socket = new Socket("localhost",port);
-            inputStream = new DataInputStream(socket.getInputStream());
-            outputStream = new DataOutputStream(socket.getOutputStream());
+            outputStream = new ObjectEncoderOutputStream(socket.getOutputStream());
+            inputStream = new ObjectDecoderInputStream(socket.getInputStream());
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR,"Не удалось подключится к серверу.", ButtonType.OK);
             alert.showAndWait();
@@ -26,28 +27,12 @@ public class Network {
         }
     }
 
-    public DataInputStream getInputStream() {
-        return inputStream;
+    public CloudMessage read() throws IOException, ClassNotFoundException {
+        return (CloudMessage) inputStream.readObject();
     }
 
-    public DataOutputStream getOutputStream() {
-        return outputStream;
-    }
-
-    public String readCommand() throws IOException {
-        return inputStream.readUTF();
-    }
-
-    public int readInt() throws IOException {
-        return inputStream.readInt();
-    }
-
-    public long readLong() throws IOException {
-        return inputStream.readLong();
-    }
-
-    public void writeCommand(String message) throws IOException {
-        outputStream.writeUTF(message);
+    public void writeCommand(CloudMessage message) throws IOException {
+        outputStream.writeObject(message);
         outputStream.flush();
     }
     
