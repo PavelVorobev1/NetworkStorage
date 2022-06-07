@@ -29,8 +29,7 @@ public class ClientController implements Initializable {
     @FXML
     public Button downloadButton;
 
-    //    String homeDir = "client-files";
-    Path homeDir = Path.of("client-files");
+    Path directory = Path.of("client-files");
 
     private Network network;
 
@@ -62,9 +61,9 @@ public class ClientController implements Initializable {
                     serverTable.getItems().addAll(fileInfoArray);
                 } else if (command instanceof FileMessage) {
                     FileMessage fileMessage = (FileMessage) command;
-                    Path current = homeDir.resolve(fileMessage.getName());
+                    Path current = directory.resolve(fileMessage.getName());
                     Files.write(current, fileMessage.getData());
-                    getFileClient(homeDir);
+                    getFileClient(directory);
                 }
             }
 
@@ -75,7 +74,6 @@ public class ClientController implements Initializable {
             e.printStackTrace();
         }
     }
-
 
 
     private void createListServer() {
@@ -121,11 +119,15 @@ public class ClientController implements Initializable {
                 @Override
                 protected void updateItem(Long item, boolean empty) {
                     super.updateItem(item, empty);
+                    String text;
                     if (item == null || empty) {
                         setText(null);
                         setStyle("");
-                    } else {
-                        String text = String.format("%,d bytes", item);
+                    } else if(item <= -1L){
+                        text = "[DIR]";
+                        setText(text);
+                    }else {
+                         text = String.format("%,d bytes", item);
                         setText(text);
                     }
                 }
@@ -133,7 +135,7 @@ public class ClientController implements Initializable {
         });
 
         clientTable.getColumns().addAll(filenameColumnClient, fileSizeColumnClient);
-        getFileClient(homeDir);
+        getFileClient(directory);
     }
 
     private void getFileClient(Path path) {
@@ -142,8 +144,7 @@ public class ClientController implements Initializable {
             clientTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
             clientTable.sort();
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось считать файлы", ButtonType.OK);
-            alert.showAndWait();
+            alertWindow("Не удалось считать файлы");
             e.printStackTrace();
         }
     }
@@ -153,8 +154,7 @@ public class ClientController implements Initializable {
             String file = serverTable.getSelectionModel().getSelectedItem().toString();
             network.writeCommand(new FileRequest(file));
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось скачать файл.", ButtonType.OK);
-            alert.showAndWait();
+            alertWindow("Не удалось скачать файл.");
             System.err.println("Не удалось скачать файл.");
             e.printStackTrace();
         }
@@ -162,34 +162,40 @@ public class ClientController implements Initializable {
 
     public void buttonUploadAction(ActionEvent actionEvent) {
         if (clientTable.getSelectionModel().getSelectedItem().isDir()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Нельзя отправить папку. Выберите файл", ButtonType.OK);
-            alert.showAndWait();
+            alertWindow("Нельзя отправить папку. Выберите файл");
         } else {
             try {
                 String file = clientTable.getSelectionModel().getSelectedItem().getFileName();
-                network.writeCommand(new FileMessage(homeDir.resolve(file)));
+                network.writeCommand(new FileMessage(directory.resolve(file)));
             } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл.", ButtonType.OK);
-                alert.showAndWait();
+                alertWindow("Не удалось отправить файл.");
                 System.err.println("Не удалось отправить файл.");
                 e.printStackTrace();
             }
         }
     }
 
+    private void alertWindow(String contentText) {
+        Alert alert = new Alert(Alert.AlertType.WARNING, contentText, ButtonType.OK);
+        alert.showAndWait();
+    }
+
     public void buttonClientPathIn(ActionEvent actionEvent) {
         if (!clientTable.getSelectionModel().getSelectedItem().isDir()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Нельзя открыть файл. Выберите папку", ButtonType.OK);
-            alert.showAndWait();
+            alertWindow("Нельзя открыть файл. Выберите папку");
         } else {
-            homeDir = homeDir.resolve(clientTable.getSelectionModel().getSelectedItem().getFileName());
-            getFileClient(homeDir);
+            directory = directory.resolve(clientTable.getSelectionModel().getSelectedItem().getFileName());
+            getFileClient(directory);
         }
     }
 
     public void buttonClientPathUp(ActionEvent actionEvent) {
-        homeDir = homeDir.resolve("..");
-        getFileClient(homeDir);
+        if (directory.normalize().equals(Path.of("client-files"))) {
+            alertWindow("Нельзя подняться выше.");
+        } else {
+            directory = directory.resolve("..");
+            getFileClient(directory);
+        }
     }
 
     public void buttonServerPathUp(ActionEvent actionEvent) {
@@ -211,8 +217,7 @@ public class ClientController implements Initializable {
             String path = serverTable.getSelectionModel().getSelectedItem().toString();
             network.writeCommand(new PathInRequest(path));
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Нужно выбрать папку", ButtonType.OK);
-            alert.showAndWait();
+            alertWindow("Нужно выбрать папку");
             System.err.println("Нужно выбрать папку");
             e.printStackTrace();
         }

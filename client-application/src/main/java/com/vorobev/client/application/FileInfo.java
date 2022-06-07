@@ -17,10 +17,10 @@ public class FileInfo {
         return sizeFile;
     }
 
-//    public FileInfo(String fileName, long l) {
-//        this.fileName = fileName;
-//        this.sizeFile = sizeFile;
-//    }
+    public FileInfo(String fileName, long l) {
+        this.fileName = fileName;
+        this.sizeFile = sizeFile;
+    }
 
     public FileInfo(String fileName) {
         this.fileName = fileName;
@@ -35,17 +35,17 @@ public class FileInfo {
         try {
             this.path = path;
             this.fileName = path.getFileName().toString();
-            this.sizeFile = Files.size(path);
+            if (Files.isDirectory(path)) {
+                this.sizeFile = -1L;
+            } else {
+                this.sizeFile = Files.size(path);
+            }
         } catch (IOException e) {
-            System.err.println("Не удалось получить информацию о файле");
-            e.printStackTrace();
+            throw new RuntimeException("Не удалось получить информацию о файле");
         }
     }
 
     public boolean isDir() {
-        if(Files.isDirectory(path)){
-            return true;
-        }
-        return false;
+        return Files.isDirectory(path);
     }
 }
