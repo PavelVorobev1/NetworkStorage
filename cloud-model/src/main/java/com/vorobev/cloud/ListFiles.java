@@ -5,18 +5,21 @@ import lombok.Data;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 public class ListFiles implements CloudMessage {
 
-    private final List<String> files;
+    private final List<FileInfo> files = new ArrayList<>();
 
     public ListFiles(Path path) throws IOException {
-        files = Files.list(path)
-                .map(p -> p.getFileName().toString())
-                .collect(Collectors.toList());
+        List<FileInfo> info;
+        info =  Files.list(path).map(FileInfo::new).collect(Collectors.toList());
+        for (FileInfo fileInfo : info) {
+            files.add(new FileInfo(fileInfo.getFileName(),fileInfo.getSizeFile()));
+        }
     }
 
 }

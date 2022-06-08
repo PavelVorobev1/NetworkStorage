@@ -1,10 +1,14 @@
-package com.vorobev.client.application;
+package com.vorobev.cloud;
+
+import lombok.Data;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileInfo {
+@Data
+public class FileInfo implements CloudMessage {
+
     private String fileName;
     private long sizeFile;
     private Path path;
@@ -17,13 +21,9 @@ public class FileInfo {
         return sizeFile;
     }
 
-    public FileInfo(String fileName, long l) {
+    public FileInfo(String fileName,long sizeFile) {
         this.fileName = fileName;
         this.sizeFile = sizeFile;
-    }
-
-    public FileInfo(String fileName) {
-        this.fileName = fileName;
     }
 
     @Override
