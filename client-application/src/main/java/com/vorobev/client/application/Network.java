@@ -14,7 +14,6 @@ public class Network {
     private ObjectEncoderOutputStream outputStream;
 
     public Network(int port){
-
         try {
             Socket socket = new Socket("localhost",port);
             outputStream = new ObjectEncoderOutputStream(socket.getOutputStream());

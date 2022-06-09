@@ -1,10 +1,14 @@
-package com.vorobev.client.application;
+package com.vorobev.cloud;
+
+import lombok.Data;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileInfo {
+@Data
+public class FileInfo implements CloudMessage {
+
     private String fileName;
     private long sizeFile;
     private Path path;
@@ -17,15 +21,6 @@ public class FileInfo {
         return sizeFile;
     }
 
-    public FileInfo(String fileName, long l) {
-        this.fileName = fileName;
-        this.sizeFile = sizeFile;
-    }
-
-    public FileInfo(String fileName) {
-        this.fileName = fileName;
-    }
-
     @Override
     public String toString() {
         return fileName;
@@ -33,7 +28,6 @@ public class FileInfo {
 
     public FileInfo(Path path) {
         try {
-            this.path = path;
             this.fileName = path.getFileName().toString();
             if (Files.isDirectory(path)) {
                 this.sizeFile = -1L;
@@ -46,6 +40,6 @@ public class FileInfo {
     }
 
     public boolean isDir() {
-        return Files.isDirectory(path);
+        return sizeFile <= -1L;
     }
 }

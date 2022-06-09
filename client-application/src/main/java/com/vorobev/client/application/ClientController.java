@@ -1,6 +1,7 @@
 package com.vorobev.client.application;
 
 import com.vorobev.cloud.*;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -14,6 +15,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -29,7 +31,8 @@ public class ClientController implements Initializable {
     @FXML
     public Button downloadButton;
 
-    Path directory = Path.of("client-files");
+    private Path currentDir = Path.of("client-files");
+    private final Path homeDir = Path.of("client-files");
 
     private Network network;
 
@@ -46,27 +49,41 @@ public class ClientController implements Initializable {
     }
 
     private void readLoop() {
-        createListServer();
         try {
+            createListServer();
             while (true) {
                 CloudMessage command = network.read();
                 if (command instanceof ListFiles) {
                     ListFiles listFiles = (ListFiles) command;
                     serverTable.getItems().clear();
-                    List<String> fileInfoServer = listFiles.getFiles();
-                    ArrayList<FileInfo> fileInfoArray = new ArrayList<>();
-                    for (String file : fileInfoServer) {
-                        fileInfoArray.add(new FileInfo(file));
-                    }
-                    serverTable.getItems().addAll(fileInfoArray);
+                    List<FileInfo> fileInfoServer = listFiles.getFiles();
+                    ArrayList<FileInfo> arrayList = new ArrayList<>(fileInfoServer);
+                    getFileServer(arrayList);
                 } else if (command instanceof FileMessage) {
                     FileMessage fileMessage = (FileMessage) command;
-                    Path current = directory.resolve(fileMessage.getName());
+                    Path current = currentDir.resolve(fileMessage.getName());
                     Files.write(current, fileMessage.getData());
-                    getFileClient(directory);
+                    getFileClient(currentDir);
+                } else if (command instanceof WarningServerClass) {
+                    WarningServerClass warning = (WarningServerClass) command;
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (warning.getWarning()) {
+                                case "/out directory":
+                                    alertWindow("Нельзя подняться выше по директории.");
+                                    break;
+                                case "/not dir":
+                                    alertWindow("Нельзя открыть файл. Выберите папку");
+                                    break;
+                                case "/this dir":
+                                    alertWindow("Нельзя скачать папку. Выберите файл");
+                                    break;
+                            }
+                        }
+                    });
                 }
             }
-
         } catch (IOException e) {
             System.err.println("Connection lost");
             e.printStackTrace();
@@ -75,33 +92,48 @@ public class ClientController implements Initializable {
         }
     }
 
-
     private void createListServer() {
         TableColumn<FileInfo, String> filenameColumnServer = new TableColumn<>("Имя файла");
         filenameColumnServer.setCellValueFactory(new PropertyValueFactory<>("fileName"));
         filenameColumnServer.setPrefWidth(150);
 
-//        TableColumn<FileInfo, Long> fileSizeColumnServer = new TableColumn<>("Размер файла");
-//        fileSizeColumnServer.setCellValueFactory(new PropertyValueFactory<>("sizeFile"));
-//        fileSizeColumnServer.setPrefWidth(100);
-//
-//        fileSizeColumnServer.setCellFactory(column -> {
-//            return new TableCell<FileInfo, Long>() {
-//                @Override
-//                protected void updateItem(Long item, boolean empty) {
-//                    super.updateItem(item, empty);
-//                    if (item == null || empty) {
-//                        setText(null);
-//                        setStyle("");
-//                    } else {
-//                        String text = String.format("%,d bytes", item);
-//                        setText(text);
-//                    }
-//                }
-//            };
-//        });
+        TableColumn<FileInfo, Long> fileSizeColumnServer = new TableColumn<>("Размер файла");
+        fileSizeColumnServer.setCellValueFactory(new PropertyValueFactory<>("sizeFile"));
+        fileSizeColumnServer.setPrefWidth(100);
 
-        serverTable.getColumns().addAll(filenameColumnServer);
+        fileSizeColumnServer.setCellFactory(column -> {
+            return new TableCell<FileInfo, Long>() {
+                @Override
+                protected void updateItem(Long item, boolean empty) {
+                    super.updateItem(item, empty);
+                    String text;
+                    if (item == null || empty) {
+                        setText(null);
+                        setStyle("");
+                    } else if (item <= -1L) {
+                        text = "[DIR]";
+                        setText(text);
+                    } else {
+                        text = String.format("%,d bytes", item);
+                        setText(text);
+                    }
+                }
+            };
+        });
+
+        serverTable.getColumns().addAll(filenameColumnServer, fileSizeColumnServer);
+
+    }
+
+    private void getFileServer(ArrayList<FileInfo> list) {
+        serverTable.getItems().clear();
+        serverTable.getItems().addAll(list);
+        serverTable.getItems().sort(new Comparator<FileInfo>() {
+            @Override
+            public int compare(FileInfo o1, FileInfo o2) {
+                return Long.valueOf(o1.getSizeFile() - o2.getSizeFile()).intValue();
+            }
+        });
     }
 
 
@@ -123,26 +155,30 @@ public class ClientController implements Initializable {
                     if (item == null || empty) {
                         setText(null);
                         setStyle("");
-                    } else if(item <= -1L){
+                    } else if (item <= -1L) {
                         text = "[DIR]";
                         setText(text);
-                    }else {
-                         text = String.format("%,d bytes", item);
+                    } else {
+                        text = String.format("%,d bytes", item);
                         setText(text);
                     }
                 }
             };
         });
-
         clientTable.getColumns().addAll(filenameColumnClient, fileSizeColumnClient);
-        getFileClient(directory);
+        getFileClient(currentDir);
     }
 
     private void getFileClient(Path path) {
         try {
             clientTable.getItems().clear();
             clientTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
-            clientTable.sort();
+            clientTable.getItems().sort(new Comparator<FileInfo>() {
+                @Override
+                public int compare(FileInfo o1, FileInfo o2) {
+                    return Long.valueOf(o1.getSizeFile() - o2.getSizeFile()).intValue();
+                }
+            });
         } catch (IOException e) {
             alertWindow("Не удалось считать файлы");
             e.printStackTrace();
@@ -151,8 +187,12 @@ public class ClientController implements Initializable {
 
     public void buttonDownloadAction(ActionEvent actionEvent) {
         try {
-            String file = serverTable.getSelectionModel().getSelectedItem().toString();
-            network.writeCommand(new FileRequest(file));
+            if (serverTable.getSelectionModel().getSelectedItem() == null) {
+                alertWindow("Выберите файл который хотите скачать с сервера.");
+            } else {
+                String file = serverTable.getSelectionModel().getSelectedItem().toString();
+                network.writeCommand(new FileRequest(file));
+            }
         } catch (IOException e) {
             alertWindow("Не удалось скачать файл.");
             System.err.println("Не удалось скачать файл.");
@@ -161,12 +201,14 @@ public class ClientController implements Initializable {
     }
 
     public void buttonUploadAction(ActionEvent actionEvent) {
-        if (clientTable.getSelectionModel().getSelectedItem().isDir()) {
+        if (clientTable.getSelectionModel().getSelectedItem() == null) {
+            alertWindow("Выберите файл который хотите отправить на сервер");
+        } else if (clientTable.getSelectionModel().getSelectedItem().isDir()) {
             alertWindow("Нельзя отправить папку. Выберите файл");
         } else {
             try {
                 String file = clientTable.getSelectionModel().getSelectedItem().getFileName();
-                network.writeCommand(new FileMessage(directory.resolve(file)));
+                network.writeCommand(new FileMessage(currentDir.resolve(file)));
             } catch (IOException e) {
                 alertWindow("Не удалось отправить файл.");
                 System.err.println("Не удалось отправить файл.");
@@ -184,17 +226,17 @@ public class ClientController implements Initializable {
         if (!clientTable.getSelectionModel().getSelectedItem().isDir()) {
             alertWindow("Нельзя открыть файл. Выберите папку");
         } else {
-            directory = directory.resolve(clientTable.getSelectionModel().getSelectedItem().getFileName());
-            getFileClient(directory);
+            currentDir = currentDir.resolve(clientTable.getSelectionModel().getSelectedItem().getFileName());
+            getFileClient(currentDir);
         }
     }
 
     public void buttonClientPathUp(ActionEvent actionEvent) {
-        if (directory.normalize().equals(Path.of("client-files"))) {
-            alertWindow("Нельзя подняться выше.");
+        if (currentDir.normalize().equals(Path.of(String.valueOf(homeDir)))) {
+            alertWindow("Нельзя подняться выше по директории");
         } else {
-            directory = directory.resolve("..");
-            getFileClient(directory);
+            currentDir = currentDir.resolve("..");
+            getFileClient(currentDir);
         }
     }
 
@@ -208,11 +250,6 @@ public class ClientController implements Initializable {
     }
 
     public void buttonServerPathIn(ActionEvent actionEvent) {
-//        FileInfo info = new FileInfo("1");
-//        if (serverTable.getSelectionModel().getSelectedItem().getClass().isInstance(info)) {
-//            Alert alert = new Alert(Alert.AlertType.WARNING, "Нельзя открыть файл. Выберите папку", ButtonType.OK);
-//            alert.showAndWait();
-//        } else {
         try {
             String path = serverTable.getSelectionModel().getSelectedItem().toString();
             network.writeCommand(new PathInRequest(path));
@@ -221,7 +258,5 @@ public class ClientController implements Initializable {
             System.err.println("Нужно выбрать папку");
             e.printStackTrace();
         }
-//        }
-
     }
 }

@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 @Data
 public class ListFiles implements CloudMessage {
 
-    private final List<String> files;
+    private final List<FileInfo> files;
 
     public ListFiles(Path path) throws IOException {
-        files = Files.list(path)
-                .map(p -> p.getFileName().toString())
-                .collect(Collectors.toList());
+
+        files = Files.list(path).map(FileInfo::new).collect(Collectors.toList());
+
     }
 
 }

@@ -14,10 +14,13 @@
                   <Font size="16.0" />
                </font>
             </Label>
-            <HBox alignment="CENTER">
+            <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <children>
                   <Button mnemonicParsing="false" onAction="#buttonClientPathIn" text="Открыть папку" />
-                  <Button mnemonicParsing="false" onAction="#buttonClientPathUp" text="Выйти из папки" />
+                  <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#buttonClientPathUp" text="Выйти из папки">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin></Button>
                </children>
             </HBox>
             <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
