@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,6 +15,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -57,15 +57,31 @@ public class ClientController implements Initializable {
                     ListFiles listFiles = (ListFiles) command;
                     serverTable.getItems().clear();
                     List<FileInfo> fileInfoServer = listFiles.getFiles();
-                    ArrayList<FileInfo> arrayList = new ArrayList<>();
-                    arrayList.addAll(fileInfoServer);
+                    ArrayList<FileInfo> arrayList = new ArrayList<>(fileInfoServer);
                     getFileServer(arrayList);
-
                 } else if (command instanceof FileMessage) {
                     FileMessage fileMessage = (FileMessage) command;
                     Path current = currentDir.resolve(fileMessage.getName());
                     Files.write(current, fileMessage.getData());
                     getFileClient(currentDir);
+                } else if (command instanceof WarningServerClass) {
+                    WarningServerClass warning = (WarningServerClass) command;
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (warning.getWarning()) {
+                                case "/out directory":
+                                    alertWindow("Нельзя подняться выше по директории.");
+                                    break;
+                                case "/not dir":
+                                    alertWindow("Нельзя открыть файл. Выберите папку");
+                                    break;
+                                case "/this dir":
+                                    alertWindow("Нельзя скачать папку. Выберите файл");
+                                    break;
+                            }
+                        }
+                    });
                 }
             }
         } catch (IOException e) {
@@ -112,6 +128,12 @@ public class ClientController implements Initializable {
     private void getFileServer(ArrayList<FileInfo> list) {
         serverTable.getItems().clear();
         serverTable.getItems().addAll(list);
+        serverTable.getItems().sort(new Comparator<FileInfo>() {
+            @Override
+            public int compare(FileInfo o1, FileInfo o2) {
+                return Long.valueOf(o1.getSizeFile() - o2.getSizeFile()).intValue();
+            }
+        });
     }
 
 
@@ -151,7 +173,12 @@ public class ClientController implements Initializable {
         try {
             clientTable.getItems().clear();
             clientTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
-            clientTable.sort();
+            clientTable.getItems().sort(new Comparator<FileInfo>() {
+                @Override
+                public int compare(FileInfo o1, FileInfo o2) {
+                    return Long.valueOf(o1.getSizeFile() - o2.getSizeFile()).intValue();
+                }
+            });
         } catch (IOException e) {
             alertWindow("Не удалось считать файлы");
             e.printStackTrace();
@@ -206,7 +233,7 @@ public class ClientController implements Initializable {
 
     public void buttonClientPathUp(ActionEvent actionEvent) {
         if (currentDir.normalize().equals(Path.of(String.valueOf(homeDir)))) {
-            alertWindow("Нельзя подняться выше.");
+            alertWindow("Нельзя подняться выше по директории");
         } else {
             currentDir = currentDir.resolve("..");
             getFileClient(currentDir);

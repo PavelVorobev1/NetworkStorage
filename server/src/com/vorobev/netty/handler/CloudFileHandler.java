@@ -5,7 +5,6 @@ import com.vorobev.cloud.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,7 +32,11 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
         if (cloudMessage instanceof FileRequest) {
 
             FileRequest fileRequest = (FileRequest) cloudMessage;
-            ctx.writeAndFlush(new FileMessage(currentDir.resolve(fileRequest.getName())));
+            if (Files.isDirectory(currentDir.resolve(Path.of(fileRequest.getName())))) {
+                ctx.writeAndFlush(new WarningServerClass("/this dir"));
+            } else {
+                ctx.writeAndFlush(new FileMessage(currentDir.resolve(fileRequest.getName())));
+            }
 
         } else if (cloudMessage instanceof FileMessage) {
 
@@ -45,16 +48,21 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
 
             if (currentDir.normalize().equals(Path.of(String.valueOf(homeDir)))) {
                 ctx.writeAndFlush(new WarningServerClass("/out directory"));
-            }else{
+            } else {
                 currentDir = currentDir.resolve("..");
                 ctx.writeAndFlush(new ListFiles(currentDir));
             }
 
         } else if (cloudMessage instanceof PathInRequest) {
-
             PathInRequest pathInRequest = (PathInRequest) cloudMessage;
-            currentDir = currentDir.resolve(Path.of(pathInRequest.getPath()));
-            ctx.writeAndFlush(new ListFiles(currentDir));
+
+            if (!Files.isDirectory(currentDir.resolve(Path.of(pathInRequest.getPath())))) {
+                ctx.writeAndFlush(new WarningServerClass("/not dir"));
+            } else {
+                currentDir = currentDir.resolve(Path.of(pathInRequest.getPath()));
+                ctx.writeAndFlush(new ListFiles(currentDir));
+            }
+
         }
     }
 }

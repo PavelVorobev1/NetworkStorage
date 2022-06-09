@@ -21,11 +21,6 @@ public class FileInfo implements CloudMessage {
         return sizeFile;
     }
 
-    public FileInfo(String fileName,long sizeFile) {
-        this.fileName = fileName;
-        this.sizeFile = sizeFile;
-    }
-
     @Override
     public String toString() {
         return fileName;
@@ -33,7 +28,6 @@ public class FileInfo implements CloudMessage {
 
     public FileInfo(Path path) {
         try {
-            this.path = path;
             this.fileName = path.getFileName().toString();
             if (Files.isDirectory(path)) {
                 this.sizeFile = -1L;
@@ -46,6 +40,6 @@ public class FileInfo implements CloudMessage {
     }
 
     public boolean isDir() {
-        return Files.isDirectory(path);
+        return sizeFile <= -1L;
     }
 }
