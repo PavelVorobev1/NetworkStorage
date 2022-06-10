@@ -50,6 +50,7 @@ public class ClientController implements Initializable {
 
     private void readLoop() {
         try {
+            network.writeCommand(new AuthStatusClass(true));
             createListServer();
             while (true) {
                 CloudMessage command = network.read();

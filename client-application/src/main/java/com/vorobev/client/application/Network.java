@@ -26,6 +26,11 @@ public class Network {
         }
     }
 
+    public void close() throws IOException {
+        outputStream.close();
+        inputStream.close();
+    }
+
     public CloudMessage read() throws IOException, ClassNotFoundException {
         return (CloudMessage) inputStream.readObject();
     }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.AuthController">
+   <children>
+      <TextField fx:id="loginField" layoutX="76.0" layoutY="63.0" onAction="#authButton" promptText="Логин" />
+      <PasswordField fx:id="passwordField" layoutX="76.0" layoutY="100.0" onAction="#authButton" promptText="Пароль" />
+      <Label layoutX="94.0" layoutY="14.0" text="Авторизация">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Label>
+      <Button layoutX="39.0" layoutY="149.0" mnemonicParsing="false" onAction="#authButton" prefHeight="25.0" prefWidth="75.0" text="Войти" />
+      <Button layoutX="172.0" layoutY="149.0" mnemonicParsing="false" onAction="#regButton" prefHeight="25.0" prefWidth="107.0" text="Регистрация" />
+   </children>
+</AnchorPane>
