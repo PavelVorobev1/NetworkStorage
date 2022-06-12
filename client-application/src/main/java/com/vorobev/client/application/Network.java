@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class Network {
+    private Network network;
     private ObjectDecoderInputStream inputStream;
     private ObjectEncoderOutputStream outputStream;
 

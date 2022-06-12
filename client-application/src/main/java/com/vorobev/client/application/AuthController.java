@@ -1,20 +1,17 @@
 package com.vorobev.client.application;
 
 import com.vorobev.cloud.AuthStatusClass;
-import com.vorobev.cloud.UserInfo;
 import com.vorobev.cloud.CloudMessage;
+import com.vorobev.cloud.UserInfo;
+import com.vorobev.cloud.WarningServerClass;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,16 +22,19 @@ public class AuthController implements Initializable {
     public PasswordField passwordField;
     @FXML
     public TextField loginField;
+    @FXML
+    public Button logButton;
+    @FXML
+    public Button registrationButton;
 
-    Network network;
-
+    private Network network;
 
     public void authButton(ActionEvent actionEvent) {
-        if(loginField.getText().isEmpty() || passwordField.getText().isEmpty()){
+        if (loginField.getText().isEmpty() || passwordField.getText().isEmpty()) {
             alertWindow("Введите логин и пароль");
         } else {
             try {
-                network.writeCommand(new UserInfo(loginField.getText(),passwordField.getText()));
+                network.writeCommand(new UserInfo(loginField.getText().trim(), passwordField.getText().trim()));
             } catch (IOException e) {
                 System.err.println("Не удалось отправить логин и пароль");
                 e.printStackTrace();
@@ -43,6 +43,23 @@ public class AuthController implements Initializable {
     }
 
     public void regButton(ActionEvent actionEvent) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Stage stage = new Stage();
+                    FXMLLoader regWindow = new FXMLLoader(RegistrationController.class.getResource("registration.fxml"));
+                    Scene regScene = new Scene(regWindow.load());
+                    stage.setTitle("Регистрация");
+                    stage.setScene(regScene);
+                    stage.show();
+                } catch (IOException e) {
+                    System.err.println("Не удалось открыть окно регистраци");
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
     @Override
@@ -51,30 +68,47 @@ public class AuthController implements Initializable {
         Thread readThread = new Thread(this::readLoop);
         readThread.setDaemon(true);
         readThread.start();
-
     }
 
-    private void readLoop(){
+    private void readLoop() {
         boolean authStatus = false;
         try {
-            while (!authStatus){
+            while (!authStatus) {
                 CloudMessage command = network.read();
-                AuthStatusClass auth = (AuthStatusClass) command;
-                authStatus = auth.isStatus();
+                if (command instanceof WarningServerClass) {
+                    WarningServerClass warning = (WarningServerClass) command;
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            alertWindow(warning.getWarning());
+                        }
+                    });
+                } else if (command instanceof AuthStatusClass) {
+                    AuthStatusClass auth = (AuthStatusClass) command;
+                    authStatus = auth.isStatus();
+                }
             }
-            network.close();
-
+            Stage window = (Stage) logButton.getScene().getWindow();
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        openWindow();
+                        window.close();
+                        Stage stage = new Stage();
+                        FXMLLoader fileManagerWindow = new FXMLLoader(ClientApplication.class.getResource("hello-view.fxml"));
+                        Scene fileManager = new Scene(fileManagerWindow.load());
+                        stage.setTitle("File manager");
+                        stage.setScene(fileManager);
+                        stage.show();
                     } catch (IOException e) {
+                        alertWindow("Не удалось запустить приложение");
+                        System.err.println("Не удалось запустить приложение");
                         e.printStackTrace();
                     }
                 }
             });
         } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Ошибка авторизации.");
             e.printStackTrace();
         }
     }
@@ -84,12 +118,9 @@ public class AuthController implements Initializable {
         alert.showAndWait();
     }
 
-    private void openWindow() throws IOException {
-        Stage stage = new Stage();
-        FXMLLoader fileManagerWindow = new FXMLLoader(ClientApplication.class.getResource("hello-view.fxml"));
-        Scene fileManager = new Scene(fileManagerWindow.load());
-        stage.setTitle("File manager");
-        stage.setScene(fileManager);
-        stage.show();
+    private void openApplicationWindow() throws IOException {
+
     }
+
+
 }

@@ -34,13 +34,11 @@ public class ClientController implements Initializable {
     private Path currentDir = Path.of("client-files");
     private final Path homeDir = Path.of("client-files");
 
-    private Network network;
+    private Network network ;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         network = new Network(8189);
-
         createListClient();
 
         Thread readThread = new Thread(this::readLoop);

@@ -25,7 +25,6 @@ public class ClientApplication extends Application {
 //        stage.setTitle("File manager");
 //        stage.setScene(fileManager);
 //        stage.show();
-        System.out.println("Close");
     }
 
     public static void main(String[] args) {
