@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.AuthController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.AuthController">
    <children>
       <TextField fx:id="loginField" layoutX="76.0" layoutY="63.0" onAction="#authButton" promptText="Логин" />
       <PasswordField fx:id="passwordField" layoutX="76.0" layoutY="100.0" onAction="#authButton" promptText="Пароль" />

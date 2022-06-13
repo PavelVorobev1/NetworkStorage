@@ -28,7 +28,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
         if (cloudMessage instanceof FileRequest) {
             FileRequest fileRequest = (FileRequest) cloudMessage;
             if (Files.isDirectory(currentDir.resolve(Path.of(fileRequest.getName())))) {
-                ctx.writeAndFlush(new WarningServerClass("/this dir"));
+                ctx.writeAndFlush(new WarningServerClass("Нельзя скачать папку. Выберите файл"));
             } else {
                 ctx.writeAndFlush(new FileMessage(currentDir.resolve(fileRequest.getName())));
             }
@@ -39,7 +39,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
 
         } else if (cloudMessage instanceof PathUpRequest) {
             if (currentDir.normalize().equals(Path.of(String.valueOf(homeDir)))) {
-                ctx.writeAndFlush(new WarningServerClass("/out directory"));
+                ctx.writeAndFlush(new WarningServerClass("Нельзя подняться выше по директории."));
             } else {
                 currentDir = currentDir.resolve("..");
                 ctx.writeAndFlush(new ListFiles(currentDir));
@@ -47,7 +47,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
         } else if (cloudMessage instanceof PathInRequest) {
             PathInRequest pathInRequest = (PathInRequest) cloudMessage;
             if (!Files.isDirectory(currentDir.resolve(Path.of(pathInRequest.getPath())))) {
-                ctx.writeAndFlush(new WarningServerClass("/not dir"));
+                ctx.writeAndFlush(new WarningServerClass("Нельзя открыть файл. Выберите папку"));
             } else {
                 currentDir = currentDir.resolve(Path.of(pathInRequest.getPath()));
                 ctx.writeAndFlush(new ListFiles(currentDir));
@@ -67,6 +67,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
                 ctx.writeAndFlush(new WarningServerClass("Такой пользователь уже существует"));
             } else {
                 db.addUser(regUser.getRegLogin(), regUser.getRegPassword());
+                Files.createDirectories(Path.of("server.home").resolve(regUser.getRegLogin()));
                 ctx.writeAndFlush(new AuthStatusClass(true));
             }
         } else if (cloudMessage instanceof AuthStatusClass) {

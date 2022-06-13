@@ -20,32 +20,14 @@ import java.util.ResourceBundle;
 
 public class RegistrationController implements Initializable {
 
-    public TextField loginRegField;
+    @FXML
     public PasswordField passwordRegField;
-    Network network;
-
+    @FXML
+    public TextField loginRegField;
     @FXML
     public Button registrationButton;
 
-
-    public void regButton(ActionEvent actionEvent) {
-        try {
-            if (loginRegField.getText().isEmpty() || passwordRegField.getText().isEmpty()) {
-                alertWindow("Введите логин и пароль");
-            } else {
-                network.writeCommand(new RegUser(loginRegField.getText().trim(), passwordRegField.getText().trim()));
-            }
-        } catch (IOException e) {
-            System.err.println("Не удалось отправить данные на сервер.");
-            e.printStackTrace();
-        }
-    }
-
-
-    private void alertWindow(String contentText) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, contentText, ButtonType.OK);
-        alert.showAndWait();
-    }
+    Network network;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -87,4 +69,22 @@ public class RegistrationController implements Initializable {
         }
     }
 
+    public void regButton(ActionEvent actionEvent) {
+        try {
+            if (loginRegField.getText().isEmpty() || passwordRegField.getText().isEmpty()) {
+                alertWindow("Введите логин и пароль");
+            } else {
+                network.writeCommand(new RegUser(loginRegField.getText().trim(), passwordRegField.getText().trim()));
+            }
+        } catch (IOException e) {
+            System.err.println("Не удалось отправить данные на сервер.");
+            e.printStackTrace();
+        }
+    }
+
+
+    private void alertWindow(String contentText) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, contentText, ButtonType.OK);
+        alert.showAndWait();
+    }
 }
