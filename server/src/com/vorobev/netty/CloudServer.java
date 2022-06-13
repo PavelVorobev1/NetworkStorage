@@ -2,6 +2,7 @@ package com.vorobev.netty;
 
 
 import com.vorobev.netty.handler.CloudFileHandler;
+import com.vorobev.netty.handler.DbHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -18,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CloudServer {
 
     public CloudServer() {
-
         EventLoopGroup auth = new NioEventLoopGroup(1);
         EventLoopGroup worker = new NioEventLoopGroup();
 

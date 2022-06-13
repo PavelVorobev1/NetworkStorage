@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.ClientController">
+<HBox fx:id="mainHBox" minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="700.0" visible="false" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.ClientController">
    <children>
       <VBox fx:id="clientVBox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
          <children>

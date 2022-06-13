@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="185.0" prefWidth="298.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.RegistrationController">
+    <children>
+        <TextField fx:id="loginRegField" layoutX="76.0" layoutY="63.0" onAction="#regButton" promptText="Логин" />
+        <PasswordField fx:id="passwordRegField" layoutX="76.0" layoutY="100.0" onAction="#regButton" promptText="Пароль" />
+        <Label layoutX="94.0" layoutY="14.0" text="Регистрация">
+            <font>
+                <Font size="19.0" />
+            </font>
+        </Label>
+        <Button fx:id="registrationButton" layoutX="76.0" layoutY="146.0" mnemonicParsing="false" onAction="#regButton" prefHeight="25.0" prefWidth="149.0" text="Зарегистрироваться" />
+    </children>
+</AnchorPane>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane cacheShape="false" centerShape="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" scaleShape="false" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.ClientController">
+    <children>
+      <HBox fx:id="mainHBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" visible="false">
+         <children>
+              <VBox fx:id="clientVBox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                  <children>
+                      <Label fx:id="labelClient" text="Client">
+                          <font>
+                              <Font size="16.0" />
+                          </font>
+                      </Label>
+                      <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                          <children>
+                              <Button mnemonicParsing="false" onAction="#buttonClientPathIn" text="Открыть папку" />
+                              <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#buttonClientPathUp" text="Выйти из папки">
+                                  <HBox.margin>
+                                      <Insets />
+                                  </HBox.margin>
+                        </Button>
+                          </children>
+                      </HBox>
+                      <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+
+                </TableView>
+                  </children>
+              </VBox>
+              <VBox fx:id="buttonVBox" alignment="CENTER" cache="true" maxHeight="1.7976931348623157E308" maxWidth="100.0" spacing="120.0">
+                  <children>
+                      <Button fx:id="uploadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonUploadAction" text="Отправить &gt;&gt;">
+                          <VBox.margin>
+                              <Insets />
+                          </VBox.margin>
+                      </Button>
+                      <Button fx:id="downloadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonDownloadAction" text="Скачать &lt;&lt;" />
+                  </children>
+                  <opaqueInsets>
+                      <Insets />
+                  </opaqueInsets>
+              </VBox>
+              <VBox fx:id="serverVBox" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                  <children>
+                      <Label fx:id="labelServer" text="Server">
+                          <font>
+                              <Font size="16.0" />
+                          </font>
+                      </Label>
+                      <HBox alignment="CENTER">
+                          <children>
+                              <Button mnemonicParsing="false" onAction="#buttonServerPathIn" text="Открыть папку" />
+                              <Button mnemonicParsing="false" onAction="#buttonServerPathUp" text="Выйти из папки" />
+                          </children>
+                      </HBox>
+                      <TableView fx:id="serverTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+
+                </TableView>
+                  </children>
+              </VBox>
+         </children>
+      </HBox>
+      <AnchorPane fx:id="authPane" layoutX="146.0" layoutY="125.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="300.0">
+          <children>
+              <TextField fx:id="loginAuthField" layoutX="76.0" layoutY="63.0" onAction="#authButton" promptText="Логин" />
+              <PasswordField fx:id="passwordAuthField" layoutX="76.0" layoutY="100.0" onAction="#authButton" promptText="Пароль" />
+              <Label layoutX="94.0" layoutY="14.0" text="Авторизация">
+                  <font>
+                      <Font size="19.0" />
+                  </font>
+              </Label>
+              <Button fx:id="logAuthButton" layoutX="39.0" layoutY="149.0" mnemonicParsing="false" onAction="#authButton" prefHeight="25.0" prefWidth="75.0" text="Войти" />
+              <Button fx:id="registrationButton" layoutX="172.0" layoutY="149.0" mnemonicParsing="false" onAction="#regButton" prefHeight="25.0" prefWidth="107.0" text="Регистрация" />
+          </children>
+      </AnchorPane>
+    </children>
+</AnchorPane>

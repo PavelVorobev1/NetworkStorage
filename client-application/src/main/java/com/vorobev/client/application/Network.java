@@ -10,12 +10,16 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class Network {
+
     private ObjectDecoderInputStream inputStream;
+
     private ObjectEncoderOutputStream outputStream;
+
+    private  Socket socket ;
 
     public Network(int port){
         try {
-            Socket socket = new Socket("localhost",port);
+            socket = new Socket("localhost",port);
             outputStream = new ObjectEncoderOutputStream(socket.getOutputStream());
             inputStream = new ObjectDecoderInputStream(socket.getInputStream());
         } catch (IOException e) {
@@ -24,6 +28,12 @@ public class Network {
             System.err.println("Не удалось подключится к серверу");
             e.printStackTrace();
         }
+    }
+
+    public void close() throws IOException {
+        socket.close();
+        outputStream.close();
+        inputStream.close();
     }
 
     public CloudMessage read() throws IOException, ClassNotFoundException {

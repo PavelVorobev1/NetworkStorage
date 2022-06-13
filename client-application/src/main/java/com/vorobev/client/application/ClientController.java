@@ -6,9 +6,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,32 +30,70 @@ public class ClientController implements Initializable {
     @FXML
     public TableView<FileInfo> clientTable;
     @FXML
-    public TableView serverTable;
+    public TableView<FileInfo> serverTable;
     @FXML
     public Button uploadButton;
     @FXML
     public Button downloadButton;
+    @FXML
+    public HBox mainHBox;
+    @FXML
+    public TextField loginAuthField;
+    @FXML
+    public AnchorPane authPane;
+    @FXML
+    public PasswordField passwordAuthField;
+    @FXML
+    public Button logAuthButton;
+    @FXML
+    public Button registrationButton;
+
 
     private Path currentDir = Path.of("client-files");
     private final Path homeDir = Path.of("client-files");
 
     private Network network;
 
+    public void appendMessage(CloudMessage message) throws IOException {
+        network.writeCommand(message);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         network = new Network(8189);
-
         createListClient();
-
         Thread readThread = new Thread(this::readLoop);
         readThread.setDaemon(true);
         readThread.start();
     }
 
     private void readLoop() {
+        boolean authStatus = false;
         try {
-            createListServer();
+            while (!authStatus) {
+                CloudMessage command = network.read();
+                if (command instanceof WarningServerClass) {
+                    WarningServerClass warning = (WarningServerClass) command;
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            alertWindow(warning.getWarning());
+                        }
+                    });
+                } else if (command instanceof AuthStatusClass) {
+                    AuthStatusClass auth = (AuthStatusClass) command;
+                    authStatus = auth.isStatus();
+                }
+            }
+            authPane.setVisible(!authStatus);
+            mainHBox.setVisible(authStatus);
+            network.writeCommand(new AuthStatusClass(true));
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    createListServer();
+                }
+            });
             while (true) {
                 CloudMessage command = network.read();
                 if (command instanceof ListFiles) {
@@ -69,17 +112,7 @@ public class ClientController implements Initializable {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            switch (warning.getWarning()) {
-                                case "/out directory":
-                                    alertWindow("Нельзя подняться выше по директории.");
-                                    break;
-                                case "/not dir":
-                                    alertWindow("Нельзя открыть файл. Выберите папку");
-                                    break;
-                                case "/this dir":
-                                    alertWindow("Нельзя скачать папку. Выберите файл");
-                                    break;
-                            }
+                            alertWindow(warning.getWarning());
                         }
                     });
                 }
@@ -258,5 +291,39 @@ public class ClientController implements Initializable {
             System.err.println("Нужно выбрать папку");
             e.printStackTrace();
         }
+    }
+
+    public void authButton(ActionEvent actionEvent) {
+        if (loginAuthField.getText().isEmpty() || passwordAuthField.getText().isEmpty()) {
+            alertWindow("Введите логин и пароль");
+        } else {
+            try {
+                network.writeCommand(new UserInfo(loginAuthField.getText().trim(), passwordAuthField.getText().trim()));
+            } catch (IOException e) {
+                System.err.println("Не удалось отправить логин и пароль");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void regButton(ActionEvent actionEvent) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Stage stage = new Stage();
+                    FXMLLoader regWindow = new FXMLLoader(RegistrationController.class.getResource("registration.fxml"));
+                    Scene regScene = new Scene(regWindow.load());
+                    stage.setTitle("Регистрация");
+                    stage.setResizable(false);
+                    stage.setScene(regScene);
+                    stage.show();
+                } catch (IOException e) {
+                    System.err.println("Не удалось открыть окно регистраци");
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 }
