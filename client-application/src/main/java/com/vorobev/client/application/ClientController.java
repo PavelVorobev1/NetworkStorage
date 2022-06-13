@@ -48,15 +48,11 @@ public class ClientController implements Initializable {
     @FXML
     public Button registrationButton;
 
-
+    boolean authStatus = false;
     private Path currentDir = Path.of("client-files");
     private final Path homeDir = Path.of("client-files");
 
     private Network network;
-
-    public void appendMessage(CloudMessage message) throws IOException {
-        network.writeCommand(message);
-    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -68,7 +64,7 @@ public class ClientController implements Initializable {
     }
 
     private void readLoop() {
-        boolean authStatus = false;
+
         try {
             while (!authStatus) {
                 CloudMessage command = network.read();
@@ -88,12 +84,7 @@ public class ClientController implements Initializable {
             authPane.setVisible(!authStatus);
             mainHBox.setVisible(authStatus);
             network.writeCommand(new AuthStatusClass(true));
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    createListServer();
-                }
-            });
+            Platform.runLater(this::createListServer);
             while (true) {
                 CloudMessage command = network.read();
                 if (command instanceof ListFiles) {
@@ -109,12 +100,7 @@ public class ClientController implements Initializable {
                     getFileClient(currentDir);
                 } else if (command instanceof WarningServerClass) {
                     WarningServerClass warning = (WarningServerClass) command;
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            alertWindow(warning.getWarning());
-                        }
-                    });
+                    Platform.runLater(() -> alertWindow(warning.getWarning()));
                 }
             }
         } catch (IOException e) {
@@ -161,12 +147,7 @@ public class ClientController implements Initializable {
     private void getFileServer(ArrayList<FileInfo> list) {
         serverTable.getItems().clear();
         serverTable.getItems().addAll(list);
-        serverTable.getItems().sort(new Comparator<FileInfo>() {
-            @Override
-            public int compare(FileInfo o1, FileInfo o2) {
-                return Long.valueOf(o1.getSizeFile() - o2.getSizeFile()).intValue();
-            }
-        });
+        serverTable.getItems().sort((o1, o2) -> Long.valueOf(o1.getSizeFile() - o2.getSizeFile()).intValue());
     }
 
 
