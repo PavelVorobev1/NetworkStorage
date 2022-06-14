@@ -18,7 +18,7 @@ public class ClientApplication extends Application {
         Scene fileManager = new Scene(fileManagerWindow.load());
         stage.setTitle("File manager");
         stage.setScene(fileManager);
-        stage.setResizable(false);
+//        stage.setResizable(false);
         stage.show();
     }
 

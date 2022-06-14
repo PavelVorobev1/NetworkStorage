@@ -5,14 +5,17 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -47,8 +50,13 @@ public class ClientController implements Initializable {
     public Button logAuthButton;
     @FXML
     public Button registrationButton;
+    @FXML
+    public TextField newDirNameFiled;
+    @FXML
+    public ToolBar addDirToolBar;
 
-    boolean authStatus = false;
+
+    private boolean authStatus = false;
     private Path currentDir = Path.of("client-files");
     private final Path homeDir = Path.of("client-files");
 
@@ -70,12 +78,7 @@ public class ClientController implements Initializable {
                 CloudMessage command = network.read();
                 if (command instanceof WarningServerClass) {
                     WarningServerClass warning = (WarningServerClass) command;
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            alertWindow(warning.getWarning());
-                        }
-                    });
+                    Platform.runLater(() -> alertWindow(warning.getWarning()));
                 } else if (command instanceof AuthStatusClass) {
                     AuthStatusClass auth = (AuthStatusClass) command;
                     authStatus = auth.isStatus();
@@ -114,7 +117,7 @@ public class ClientController implements Initializable {
     private void createListServer() {
         TableColumn<FileInfo, String> filenameColumnServer = new TableColumn<>("Имя файла");
         filenameColumnServer.setCellValueFactory(new PropertyValueFactory<>("fileName"));
-        filenameColumnServer.setPrefWidth(150);
+        filenameColumnServer.setPrefWidth(200);
 
         TableColumn<FileInfo, Long> fileSizeColumnServer = new TableColumn<>("Размер файла");
         fileSizeColumnServer.setCellValueFactory(new PropertyValueFactory<>("sizeFile"));
@@ -140,6 +143,15 @@ public class ClientController implements Initializable {
             };
         });
 
+        serverTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getClickCount() == 2) {
+                    buttonServerPathIn();
+                }
+            }
+        });
+
         serverTable.getColumns().addAll(filenameColumnServer, fileSizeColumnServer);
 
     }
@@ -154,7 +166,7 @@ public class ClientController implements Initializable {
     private void createListClient() {
         TableColumn<FileInfo, String> filenameColumnClient = new TableColumn<>("Имя файла");
         filenameColumnClient.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getFileName()));
-        filenameColumnClient.setPrefWidth(150);
+        filenameColumnClient.setPrefWidth(200);
 
         TableColumn<FileInfo, Long> fileSizeColumnClient = new TableColumn<>("Размер файла");
         fileSizeColumnClient.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getSizeFile()));
@@ -178,6 +190,14 @@ public class ClientController implements Initializable {
                     }
                 }
             };
+        });
+        clientTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getClickCount() == 2) {
+                    buttonClientPathIn();
+                }
+            }
         });
         clientTable.getColumns().addAll(filenameColumnClient, fileSizeColumnClient);
         getFileClient(currentDir);
@@ -236,7 +256,7 @@ public class ClientController implements Initializable {
         alert.showAndWait();
     }
 
-    public void buttonClientPathIn(ActionEvent actionEvent) {
+    public void buttonClientPathIn() {
         if (!clientTable.getSelectionModel().getSelectedItem().isDir()) {
             alertWindow("Нельзя открыть файл. Выберите папку");
         } else {
@@ -263,7 +283,7 @@ public class ClientController implements Initializable {
         }
     }
 
-    public void buttonServerPathIn(ActionEvent actionEvent) {
+    public void buttonServerPathIn() {
         try {
             String path = serverTable.getSelectionModel().getSelectedItem().toString();
             network.writeCommand(new PathInRequest(path));
@@ -306,5 +326,27 @@ public class ClientController implements Initializable {
 
             }
         });
+    }
+
+    public void addDirClient(ActionEvent actionEvent) {
+        addDirToolBar.setVisible(true);
+    }
+
+    public void addDirServer(ActionEvent actionEvent) {
+// Пока не работает.
+    }
+
+    public void createDir() {
+        try {
+            if (newDirNameFiled.getText().isEmpty()) {
+                alertWindow("Введите название папки");
+            } else {
+                Files.createDirectories(currentDir.resolve(Path.of(newDirNameFiled.getText().trim())));
+                getFileClient(currentDir);
+                addDirToolBar.setVisible(false);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
