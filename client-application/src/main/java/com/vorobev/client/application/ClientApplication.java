@@ -14,17 +14,11 @@ import java.io.IOException;
 public class ClientApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-//        FXMLLoader authWindow = new FXMLLoader(ClientController.class.getResource("auth.fxml"));
-//        stage.setScene(new Scene(authWindow.load()));
-//        stage.setResizable(false);
-//        stage.setTitle("Авторизация");
-//        stage.show();
-
-//        Stage stage = new Stage();
         FXMLLoader fileManagerWindow = new FXMLLoader(ClientApplication.class.getResource("main.fxml"));
         Scene fileManager = new Scene(fileManagerWindow.load());
         stage.setTitle("File manager");
         stage.setScene(fileManager);
+//        stage.setResizable(false);
         stage.show();
     }
 
