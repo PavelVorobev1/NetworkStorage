@@ -1,4 +1,4 @@
-package com.vorobev.client.application;
+package com.vorobev.client.application.controllers;
 
 import com.vorobev.client.application.network.Network;
 import com.vorobev.cloud.AuthStatusClass;
@@ -14,8 +14,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-// Не засунул в папку контроллеров, так окон открывается только из этой папки. С проблемой разберусь
 
 public class RegistrationController implements Initializable {
 

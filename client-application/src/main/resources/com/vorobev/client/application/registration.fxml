@@ -6,7 +6,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="222.0"
             prefWidth="406.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.vorobev.client.application.RegistrationController">
+            fx:controller="com.vorobev.client.application.controllers.RegistrationController">
     <TextField fx:id="loginRegField" layoutX="110.0" layoutY="80.0" onAction="#regButton" promptText="Логин">
         <font>
         <Font size="15.0"/>

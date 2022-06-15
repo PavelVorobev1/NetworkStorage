@@ -1,6 +1,6 @@
 package com.vorobev.client.application.controllers;
 
-import com.vorobev.client.application.RegistrationController;
+import com.vorobev.client.application.ClientApplication;
 import com.vorobev.client.application.network.Network;
 import com.vorobev.cloud.*;
 import javafx.application.Platform;
@@ -47,6 +47,8 @@ public class ClientController implements Initializable {
     public ToolBar openNewDirToolBarServer;
     @FXML
     public TextField newDirNameFieldServer;
+    @FXML
+    public AnchorPane authWindow;
 
 
     private boolean authStatus = false;
@@ -85,7 +87,6 @@ public class ClientController implements Initializable {
                 CloudMessage command = network.read();
                 if (command instanceof ListFiles) {
                     ListFiles listFiles = (ListFiles) command;
-                    serverTable.getItems().clear();
                     List<FileInfo> fileInfoServer = listFiles.getFiles();
                     ArrayList<FileInfo> arrayList = new ArrayList<>(fileInfoServer);
                     getFileServer(arrayList);
@@ -289,7 +290,7 @@ public class ClientController implements Initializable {
         Platform.runLater(() -> {
             try {
                 Stage stage = new Stage();
-                FXMLLoader fileManagerWindow = new FXMLLoader(RegistrationController.class.getResource("registration.fxml"));
+                FXMLLoader fileManagerWindow = new FXMLLoader(ClientApplication.class.getResource("registration.fxml"));
                 Scene fileManager = new Scene(fileManagerWindow.load());
                 stage.setTitle("File manager");
                 stage.setScene(fileManager);

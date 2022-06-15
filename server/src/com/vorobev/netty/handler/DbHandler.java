@@ -27,7 +27,17 @@ public class DbHandler implements Runnable {
             e.printStackTrace();
         }
     }
-
+    public void close(){
+        try {
+            connection.close();
+            findUserStatement.close();
+            addUserStatement.close();
+            getUserStatement.close();
+            log.debug("Connection closed");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     public boolean findUserForAuth(String login, String password) throws SQLException {
         findUserStatement.setString(1, login);
         findUserStatement.setString(2, password);

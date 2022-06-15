@@ -57,9 +57,10 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
             if (db.findUserForAuth(userInfo.getLogin(), userInfo.getPassword())) {
                 homeDir = homeDir.resolve(userInfo.getLogin());
                 currentDir = homeDir;
+                db.close();
                 ctx.writeAndFlush(new AuthStatusClass(true));
             } else {
-                ctx.writeAndFlush(new WarningServerClass("Пользователь не найден"));
+                ctx.writeAndFlush(new WarningServerClass("Такого пользователя не существует или логин и пароль введены не верно"));
             }
         } else if (cloudMessage instanceof RegUser) {
             RegUser regUser = (RegUser) cloudMessage;
@@ -71,8 +72,11 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
                 ctx.writeAndFlush(new AuthStatusClass(true));
             }
         } else if (cloudMessage instanceof AuthStatusClass) {
-            ctx.writeAndFlush(new ListFiles(currentDir));
-        } else if(cloudMessage instanceof CreateNewDir){
+            AuthStatusClass authStatus = (AuthStatusClass) cloudMessage;
+            if (authStatus.isStatus()) {
+                ctx.writeAndFlush(new ListFiles(currentDir));
+            }
+        } else if (cloudMessage instanceof CreateNewDir) {
             CreateNewDir newDir = (CreateNewDir) cloudMessage;
             Files.createDirectories(currentDir.resolve(newDir.getDirName()));
             ctx.writeAndFlush(new ListFiles(currentDir));
