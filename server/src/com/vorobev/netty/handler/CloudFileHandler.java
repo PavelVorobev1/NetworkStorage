@@ -72,6 +72,10 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
             }
         } else if (cloudMessage instanceof AuthStatusClass) {
             ctx.writeAndFlush(new ListFiles(currentDir));
+        } else if(cloudMessage instanceof CreateNewDir){
+            CreateNewDir newDir = (CreateNewDir) cloudMessage;
+            Files.createDirectories(currentDir.resolve(newDir.getDirName()));
+            ctx.writeAndFlush(new ListFiles(currentDir));
         }
     }
 }

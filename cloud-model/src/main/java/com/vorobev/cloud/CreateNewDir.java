@@ -3,6 +3,6 @@ package com.vorobev.cloud;
 import lombok.Data;
 
 @Data
-public class AddDir implements CloudMessage {
+public class CreateNewDir implements CloudMessage {
     private final String dirName;
 }
