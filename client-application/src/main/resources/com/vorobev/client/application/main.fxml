@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="474.0" prefWidth="732.0" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.ClientController">
+<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="474.0" prefWidth="732.0" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.controllers.ClientController">
      <HBox fx:id="mainHBox" alignment="CENTER" cacheShape="false" centerShape="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" scaleShape="false" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
              <Label text="Client">
@@ -33,12 +33,12 @@
              <opaqueInsets>
                  <Insets />
              </opaqueInsets>
-             <Button fx:id="uploadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonUploadAction" text="Отправить &gt;&gt;">
+             <Button  maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonUploadAction" text="Отправить &gt;&gt;">
                  <VBox.margin>
                      <Insets />
                  </VBox.margin>
              </Button>
-             <Button fx:id="downloadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonDownloadAction" text="Скачать &lt;&lt;" />
+             <Button  maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonDownloadAction" text="Скачать &lt;&lt;" />
          </VBox>
          <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
              <Label text="Server">

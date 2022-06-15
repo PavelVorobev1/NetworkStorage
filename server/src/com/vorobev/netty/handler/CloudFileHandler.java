@@ -15,7 +15,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
     private Path homeDir = Path.of("server.home");
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         db.run();
     }
 

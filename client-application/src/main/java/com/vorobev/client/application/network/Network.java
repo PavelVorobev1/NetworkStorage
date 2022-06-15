@@ -1,4 +1,4 @@
-package com.vorobev.client.application;
+package com.vorobev.client.application.network;
 
 import com.vorobev.cloud.CloudMessage;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;

@@ -6,4 +6,8 @@ module com.example.clientapplication {
 
     opens com.vorobev.client.application to javafx.fxml;
     exports com.vorobev.client.application;
+    opens com.vorobev.client.application.controllers to javafx.fxml;
+    exports com.vorobev.client.application.controllers;
+    exports com.vorobev.client.application.network;
+    opens com.vorobev.client.application.network to javafx.fxml;
 }

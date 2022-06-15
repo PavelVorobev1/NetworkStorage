@@ -1,5 +1,7 @@
-package com.vorobev.client.application;
+package com.vorobev.client.application.controllers;
 
+import com.vorobev.client.application.RegistrationController;
+import com.vorobev.client.application.network.Network;
 import com.vorobev.cloud.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -287,17 +289,15 @@ public class ClientController implements Initializable {
         Platform.runLater(() -> {
             try {
                 Stage stage = new Stage();
-                FXMLLoader regWindow = new FXMLLoader(RegistrationController.class.getResource("registration.fxml"));
-                Scene regScene = new Scene(regWindow.load());
-                stage.setTitle("Регистрация");
-                stage.setResizable(false);
-                stage.setScene(regScene);
+                FXMLLoader fileManagerWindow = new FXMLLoader(RegistrationController.class.getResource("registration.fxml"));
+                Scene fileManager = new Scene(fileManagerWindow.load());
+                stage.setTitle("File manager");
+                stage.setScene(fileManager);
                 stage.show();
             } catch (IOException e) {
                 System.err.println("Не удалось открыть окно регистраци");
                 e.printStackTrace();
             }
-
         });
     }
 
