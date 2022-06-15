@@ -15,12 +15,12 @@
              </Label>
              <HBox alignment="CENTER" fillHeight="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="15.0">
             <Button mnemonicParsing="false" onAction="#addDirClient" text=" Добавить папку" />
-                 <Button mnemonicParsing="false" onAction="#buttonClientPathIn" text="Открыть папку" HBox.hgrow="ALWAYS">
+                 <Button mnemonicParsing="false" onAction="#buttonClientPathIn" text="Открыть" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                          <Insets />
                      </HBox.margin>
                  </Button>
-                 <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#buttonClientPathUp" text="Выйти из папки" HBox.hgrow="ALWAYS">
+                 <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#buttonClientPathUp" text="Выйти" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                          <Insets />
                      </HBox.margin>
@@ -48,8 +48,8 @@
              </Label>
              <HBox alignment="CENTER" spacing="15.0">
             <Button mnemonicParsing="false" onAction="#addDirServer" text=" Добавить папку" />
-                 <Button mnemonicParsing="false" onAction="#buttonServerPathIn" text="Открыть папку" />
-                 <Button mnemonicParsing="false" onAction="#buttonServerPathUp" text="Выйти из папки" />
+                 <Button mnemonicParsing="false" onAction="#buttonServerPathIn" text="Открыть" />
+                 <Button mnemonicParsing="false" onAction="#buttonServerPathUp" text="Выйти" />
              </HBox>
              <TableView fx:id="serverTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
 
@@ -73,16 +73,23 @@
                  <Font size="42.0" />
              </font>
          </Label>
-         <Button fx:id="logAuthButton" layoutX="278.0" layoutY="313.0" mnemonicParsing="false" onAction="#authButton" prefHeight="52.0" prefWidth="176.0" text="Войти">
+         <Button layoutX="278.0" layoutY="313.0" mnemonicParsing="false" onAction="#authButton" prefHeight="52.0" prefWidth="176.0" text="Войти">
          <font>
             <Font size="25.0" />
          </font></Button>
-         <Button fx:id="registrationButton" layoutX="313.0" layoutY="402.0" mnemonicParsing="false" onAction="#regButton" prefHeight="25.0" prefWidth="107.0" text="Регистрация" />
+         <Button layoutX="313.0" layoutY="402.0" mnemonicParsing="false" onAction="#regButton" prefHeight="25.0" prefWidth="107.0" text="Регистрация" />
      </AnchorPane>
-    <ToolBar fx:id="addDirToolBar" layoutX="179.0" layoutY="206.0" prefHeight="62.0" prefWidth="375.0" visible="false">
+    <ToolBar fx:id="openNewDirToolBarClient" layoutX="179.0" layoutY="206.0" prefHeight="62.0" prefWidth="430.0" visible="false">
         <Label text="Введите название папки" />
-        <TextField fx:id="newDirNameFiled" onAction="#createDir" promptText="Название папки" />
-        <Button mnemonicParsing="false" onAction="#createDir" text="Создать" />
+        <TextField fx:id="newDirNameFieldClient" onAction="#createDirClient" promptText="Название папки" />
+        <Button mnemonicParsing="false" onAction="#createDirClient" text="Создать" />
+      <Button mnemonicParsing="false" onAction="#cancelToolBar" text="Отмена" />
+    </ToolBar>
+    <ToolBar fx:id="openNewDirToolBarServer" layoutX="179.0" layoutY="206.0" prefHeight="62.0" prefWidth="430.0" visible="false">
+        <Label text="Введите название папки" />
+        <TextField fx:id="newDirNameFieldServer" onAction="#createDirServer" promptText="Название папки" />
+        <Button mnemonicParsing="false" onAction="#createDirServer" text="Создать" />
+      <Button contentDisplay="TOP" mnemonicParsing="false" onAction="#cancelToolBar" text="Отмена" />
     </ToolBar>
    <opaqueInsets>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

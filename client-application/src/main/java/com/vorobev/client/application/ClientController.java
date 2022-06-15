@@ -4,18 +4,14 @@ import com.vorobev.cloud.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -23,7 +19,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -35,10 +30,6 @@ public class ClientController implements Initializable {
     @FXML
     public TableView<FileInfo> serverTable;
     @FXML
-    public Button uploadButton;
-    @FXML
-    public Button downloadButton;
-    @FXML
     public HBox mainHBox;
     @FXML
     public TextField loginAuthField;
@@ -47,13 +38,13 @@ public class ClientController implements Initializable {
     @FXML
     public PasswordField passwordAuthField;
     @FXML
-    public Button logAuthButton;
+    public TextField newDirNameFieldClient;
     @FXML
-    public Button registrationButton;
+    public ToolBar openNewDirToolBarClient;
     @FXML
-    public TextField newDirNameFiled;
+    public ToolBar openNewDirToolBarServer;
     @FXML
-    public ToolBar addDirToolBar;
+    public TextField newDirNameFieldServer;
 
 
     private boolean authStatus = false;
@@ -123,32 +114,27 @@ public class ClientController implements Initializable {
         fileSizeColumnServer.setCellValueFactory(new PropertyValueFactory<>("sizeFile"));
         fileSizeColumnServer.setPrefWidth(100);
 
-        fileSizeColumnServer.setCellFactory(column -> {
-            return new TableCell<FileInfo, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty) {
-                    super.updateItem(item, empty);
-                    String text;
-                    if (item == null || empty) {
-                        setText(null);
-                        setStyle("");
-                    } else if (item <= -1L) {
-                        text = "[DIR]";
-                        setText(text);
-                    } else {
-                        text = String.format("%,d bytes", item);
-                        setText(text);
-                    }
+        fileSizeColumnServer.setCellFactory(column -> new TableCell<FileInfo, Long>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                String text;
+                if (item == null || empty) {
+                    setText(null);
+                    setStyle("");
+                } else if (item <= -1L) {
+                    text = "[DIR]";
+                    setText(text);
+                } else {
+                    text = String.format("%,d bytes", item);
+                    setText(text);
                 }
-            };
+            }
         });
 
-        serverTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 2) {
-                    buttonServerPathIn();
-                }
+        serverTable.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getClickCount() == 2) {
+                buttonServerPathIn();
             }
         });
 
@@ -172,31 +158,26 @@ public class ClientController implements Initializable {
         fileSizeColumnClient.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getSizeFile()));
         fileSizeColumnClient.setPrefWidth(100);
 
-        fileSizeColumnClient.setCellFactory(column -> {
-            return new TableCell<FileInfo, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty) {
-                    super.updateItem(item, empty);
-                    String text;
-                    if (item == null || empty) {
-                        setText(null);
-                        setStyle("");
-                    } else if (item <= -1L) {
-                        text = "[DIR]";
-                        setText(text);
-                    } else {
-                        text = String.format("%,d bytes", item);
-                        setText(text);
-                    }
-                }
-            };
-        });
-        clientTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        fileSizeColumnClient.setCellFactory(column -> new TableCell<FileInfo, Long>() {
             @Override
-            public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 2) {
-                    buttonClientPathIn();
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                String text;
+                if (item == null || empty) {
+                    setText(null);
+                    setStyle("");
+                } else if (item <= -1L) {
+                    text = "[DIR]";
+                    setText(text);
+                } else {
+                    text = String.format("%,d bytes", item);
+                    setText(text);
                 }
+            }
+        });
+        clientTable.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getClickCount() == 2) {
+                buttonClientPathIn();
             }
         });
         clientTable.getColumns().addAll(filenameColumnClient, fileSizeColumnClient);
@@ -207,19 +188,14 @@ public class ClientController implements Initializable {
         try {
             clientTable.getItems().clear();
             clientTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
-            clientTable.getItems().sort(new Comparator<FileInfo>() {
-                @Override
-                public int compare(FileInfo o1, FileInfo o2) {
-                    return Long.valueOf(o1.getSizeFile() - o2.getSizeFile()).intValue();
-                }
-            });
+            clientTable.getItems().sort((o1, o2) -> Long.valueOf(o1.getSizeFile() - o2.getSizeFile()).intValue());
         } catch (IOException e) {
             alertWindow("Не удалось считать файлы");
             e.printStackTrace();
         }
     }
 
-    public void buttonDownloadAction(ActionEvent actionEvent) {
+    public void buttonDownloadAction() {
         try {
             if (serverTable.getSelectionModel().getSelectedItem() == null) {
                 alertWindow("Выберите файл который хотите скачать с сервера.");
@@ -234,7 +210,7 @@ public class ClientController implements Initializable {
         }
     }
 
-    public void buttonUploadAction(ActionEvent actionEvent) {
+    public void buttonUploadAction() {
         if (clientTable.getSelectionModel().getSelectedItem() == null) {
             alertWindow("Выберите файл который хотите отправить на сервер");
         } else if (clientTable.getSelectionModel().getSelectedItem().isDir()) {
@@ -265,7 +241,7 @@ public class ClientController implements Initializable {
         }
     }
 
-    public void buttonClientPathUp(ActionEvent actionEvent) {
+    public void buttonClientPathUp() {
         if (currentDir.normalize().equals(Path.of(String.valueOf(homeDir)))) {
             alertWindow("Нельзя подняться выше по директории");
         } else {
@@ -274,7 +250,7 @@ public class ClientController implements Initializable {
         }
     }
 
-    public void buttonServerPathUp(ActionEvent actionEvent) {
+    public void buttonServerPathUp() {
         try {
             String path = "..";
             network.writeCommand(new PathUpRequest(path));
@@ -294,7 +270,7 @@ public class ClientController implements Initializable {
         }
     }
 
-    public void authButton(ActionEvent actionEvent) {
+    public void authButton() {
         if (loginAuthField.getText().isEmpty() || passwordAuthField.getText().isEmpty()) {
             alertWindow("Введите логин и пароль");
         } else {
@@ -307,46 +283,63 @@ public class ClientController implements Initializable {
         }
     }
 
-    public void regButton(ActionEvent actionEvent) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Stage stage = new Stage();
-                    FXMLLoader regWindow = new FXMLLoader(RegistrationController.class.getResource("registration.fxml"));
-                    Scene regScene = new Scene(regWindow.load());
-                    stage.setTitle("Регистрация");
-                    stage.setResizable(false);
-                    stage.setScene(regScene);
-                    stage.show();
-                } catch (IOException e) {
-                    System.err.println("Не удалось открыть окно регистраци");
-                    e.printStackTrace();
-                }
-
+    public void regButton() {
+        Platform.runLater(() -> {
+            try {
+                Stage stage = new Stage();
+                FXMLLoader regWindow = new FXMLLoader(RegistrationController.class.getResource("registration.fxml"));
+                Scene regScene = new Scene(regWindow.load());
+                stage.setTitle("Регистрация");
+                stage.setResizable(false);
+                stage.setScene(regScene);
+                stage.show();
+            } catch (IOException e) {
+                System.err.println("Не удалось открыть окно регистраци");
+                e.printStackTrace();
             }
+
         });
     }
 
-    public void addDirClient(ActionEvent actionEvent) {
-        addDirToolBar.setVisible(true);
+    public void addDirClient() {
+        openNewDirToolBarClient.setVisible(true);
     }
 
-    public void addDirServer(ActionEvent actionEvent) {
-// Пока не работает.
+    public void addDirServer() {
+        openNewDirToolBarServer.setVisible(true);
     }
 
-    public void createDir() {
+    public void createDirClient() {
         try {
-            if (newDirNameFiled.getText().isEmpty()) {
+            if (newDirNameFieldClient.getText().isEmpty()) {
                 alertWindow("Введите название папки");
             } else {
-                Files.createDirectories(currentDir.resolve(Path.of(newDirNameFiled.getText().trim())));
+                Files.createDirectories(currentDir.resolve(Path.of(newDirNameFieldServer.getText().trim())));
                 getFileClient(currentDir);
-                addDirToolBar.setVisible(false);
+                openNewDirToolBarClient.setVisible(false);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void createDirServer() {
+        try {
+            if (newDirNameFieldServer.getText().isEmpty()) {
+                alertWindow("Введите название папки");
+            } else {
+                network.writeCommand(new CreateNewDir(newDirNameFieldServer.getText().trim()));
+                openNewDirToolBarServer.setVisible(false);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void cancelToolBar() {
+        newDirNameFieldClient.clear();
+        newDirNameFieldServer.clear();
+        openNewDirToolBarServer.setVisible(false);
+        openNewDirToolBarClient.setVisible(false);
     }
 }
