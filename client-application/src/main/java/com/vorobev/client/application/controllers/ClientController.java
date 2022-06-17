@@ -48,8 +48,8 @@ public class ClientController implements Initializable {
     @FXML
     public TextField newDirNameFieldServer;
 
-    private Path currentDir = Path.of("client-files");
     private final Path homeDir = Path.of("client-files");
+    private Path currentDir = homeDir;
 
     private boolean authStatus = false;
 
@@ -57,6 +57,13 @@ public class ClientController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        if(!Files.exists(homeDir)){
+            try {
+                Files.createDirectories(homeDir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         network = new Network(8189);
         createListClient();
         Thread readThread = new Thread(this::readLoop);
