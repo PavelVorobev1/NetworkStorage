@@ -47,13 +47,11 @@ public class ClientController implements Initializable {
     public ToolBar openNewDirToolBarServer;
     @FXML
     public TextField newDirNameFieldServer;
-    @FXML
-    public AnchorPane authWindow;
 
-
-    private boolean authStatus = false;
     private Path currentDir = Path.of("client-files");
     private final Path homeDir = Path.of("client-files");
+
+    private boolean authStatus = false;
 
     private Network network;
 
@@ -117,7 +115,7 @@ public class ClientController implements Initializable {
         fileSizeColumnServer.setCellValueFactory(new PropertyValueFactory<>("sizeFile"));
         fileSizeColumnServer.setPrefWidth(100);
 
-        fileSizeColumnServer.setCellFactory(column -> new TableCell<FileInfo, Long>() {
+        fileSizeColumnServer.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
@@ -137,12 +135,17 @@ public class ClientController implements Initializable {
 
         serverTable.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getClickCount() == 2) {
-                buttonServerPathIn();
+                try {
+                    String path = serverTable.getSelectionModel().getSelectedItem().toString();
+                    network.writeCommand(new PathInRequest(path));
+                } catch (IOException e) {
+                    alertWindow("Нужно выбрать папку");
+                    System.err.println("Нужно выбрать папку");
+                    e.printStackTrace();
+                }
             }
         });
-
         serverTable.getColumns().addAll(filenameColumnServer, fileSizeColumnServer);
-
     }
 
     private void getFileServer(ArrayList<FileInfo> list) {
@@ -161,7 +164,7 @@ public class ClientController implements Initializable {
         fileSizeColumnClient.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getSizeFile()));
         fileSizeColumnClient.setPrefWidth(100);
 
-        fileSizeColumnClient.setCellFactory(column -> new TableCell<FileInfo, Long>() {
+        fileSizeColumnClient.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
@@ -180,7 +183,12 @@ public class ClientController implements Initializable {
         });
         clientTable.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getClickCount() == 2) {
-                buttonClientPathIn();
+                if (!clientTable.getSelectionModel().getSelectedItem().isDir()) {
+                    alertWindow("Нельзя открыть файл. Выберите папку");
+                } else {
+                    currentDir = currentDir.resolve(clientTable.getSelectionModel().getSelectedItem().getFileName());
+                    getFileClient(currentDir);
+                }
             }
         });
         clientTable.getColumns().addAll(filenameColumnClient, fileSizeColumnClient);
@@ -235,14 +243,6 @@ public class ClientController implements Initializable {
         alert.showAndWait();
     }
 
-    public void buttonClientPathIn() {
-        if (!clientTable.getSelectionModel().getSelectedItem().isDir()) {
-            alertWindow("Нельзя открыть файл. Выберите папку");
-        } else {
-            currentDir = currentDir.resolve(clientTable.getSelectionModel().getSelectedItem().getFileName());
-            getFileClient(currentDir);
-        }
-    }
 
     public void buttonClientPathUp() {
         if (currentDir.normalize().equals(Path.of(String.valueOf(homeDir)))) {
@@ -262,16 +262,6 @@ public class ClientController implements Initializable {
         }
     }
 
-    public void buttonServerPathIn() {
-        try {
-            String path = serverTable.getSelectionModel().getSelectedItem().toString();
-            network.writeCommand(new PathInRequest(path));
-        } catch (IOException e) {
-            alertWindow("Нужно выбрать папку");
-            System.err.println("Нужно выбрать папку");
-            e.printStackTrace();
-        }
-    }
 
     public void authButton() {
         if (loginAuthField.getText().isEmpty() || passwordAuthField.getText().isEmpty()) {

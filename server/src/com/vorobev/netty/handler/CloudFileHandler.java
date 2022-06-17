@@ -5,8 +5,10 @@ import com.vorobev.cloud.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 
 public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> {
 
@@ -24,7 +26,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, CloudMessage cloudMessage) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, CloudMessage cloudMessage) throws IOException, SQLException {
         if (cloudMessage instanceof FileRequest) {
             FileRequest fileRequest = (FileRequest) cloudMessage;
             if (Files.isDirectory(currentDir.resolve(Path.of(fileRequest.getName())))) {
@@ -36,7 +38,6 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
             FileMessage fileMessage = (FileMessage) cloudMessage;
             Files.write(currentDir.resolve(fileMessage.getName()), fileMessage.getData());
             ctx.writeAndFlush(new ListFiles(currentDir));
-
         } else if (cloudMessage instanceof PathUpRequest) {
             if (currentDir.normalize().equals(Path.of(String.valueOf(homeDir)))) {
                 ctx.writeAndFlush(new WarningServerClass("Нельзя подняться выше по директории."));

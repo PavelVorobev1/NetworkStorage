@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="authWindow" prefHeight="248.0" prefWidth="384.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.controllers.ClientController">
+<AnchorPane fx:id="authWindow" prefHeight="248.0" prefWidth="384.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.controllers.AuthController">
    <children>
       <Label layoutX="99.0" layoutY="21.0" text="Авторизация">
          <font>

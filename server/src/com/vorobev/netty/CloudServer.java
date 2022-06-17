@@ -2,7 +2,6 @@ package com.vorobev.netty;
 
 
 import com.vorobev.netty.handler.CloudFileHandler;
-import com.vorobev.netty.handler.DbHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -23,13 +22,12 @@ public class CloudServer {
         EventLoopGroup worker = new NioEventLoopGroup();
 
         try {
-
             ServerBootstrap server = new ServerBootstrap();
             server.group(auth, worker)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                        protected void initChannel(SocketChannel socketChannel) {
                             socketChannel.pipeline().addLast(
                                     new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
                                     new ObjectEncoder(),
