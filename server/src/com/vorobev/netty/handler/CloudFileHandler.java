@@ -5,8 +5,10 @@ import com.vorobev.cloud.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 
 public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> {
 
@@ -15,7 +17,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
     private Path homeDir = Path.of("server.home");
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         db.run();
     }
 
@@ -24,7 +26,7 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, CloudMessage cloudMessage) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, CloudMessage cloudMessage) throws IOException, SQLException {
         if (cloudMessage instanceof FileRequest) {
             FileRequest fileRequest = (FileRequest) cloudMessage;
             if (Files.isDirectory(currentDir.resolve(Path.of(fileRequest.getName())))) {
@@ -36,7 +38,6 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
             FileMessage fileMessage = (FileMessage) cloudMessage;
             Files.write(currentDir.resolve(fileMessage.getName()), fileMessage.getData());
             ctx.writeAndFlush(new ListFiles(currentDir));
-
         } else if (cloudMessage instanceof PathUpRequest) {
             if (currentDir.normalize().equals(Path.of(String.valueOf(homeDir)))) {
                 ctx.writeAndFlush(new WarningServerClass("Нельзя подняться выше по директории."));
@@ -57,9 +58,10 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
             if (db.findUserForAuth(userInfo.getLogin(), userInfo.getPassword())) {
                 homeDir = homeDir.resolve(userInfo.getLogin());
                 currentDir = homeDir;
+                db.close();
                 ctx.writeAndFlush(new AuthStatusClass(true));
             } else {
-                ctx.writeAndFlush(new WarningServerClass("Пользователь не найден"));
+                ctx.writeAndFlush(new WarningServerClass("Такого пользователя не существует или логин и пароль введены не верно"));
             }
         } else if (cloudMessage instanceof RegUser) {
             RegUser regUser = (RegUser) cloudMessage;
@@ -71,8 +73,11 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
                 ctx.writeAndFlush(new AuthStatusClass(true));
             }
         } else if (cloudMessage instanceof AuthStatusClass) {
-            ctx.writeAndFlush(new ListFiles(currentDir));
-        } else if(cloudMessage instanceof CreateNewDir){
+            AuthStatusClass authStatus = (AuthStatusClass) cloudMessage;
+            if (authStatus.isStatus()) {
+                ctx.writeAndFlush(new ListFiles(currentDir));
+            }
+        } else if (cloudMessage instanceof CreateNewDir) {
             CreateNewDir newDir = (CreateNewDir) cloudMessage;
             Files.createDirectories(currentDir.resolve(newDir.getDirName()));
             ctx.writeAndFlush(new ListFiles(currentDir));

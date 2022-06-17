@@ -4,21 +4,24 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="222.0" prefWidth="406.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vorobev.client.application.RegistrationController">
-    <children>
-        <TextField fx:id="loginRegField" layoutX="110.0" layoutY="80.0" onAction="#regButton" promptText="Логин">
-         <font>
-            <Font size="15.0" />
-         </font></TextField>
-        <PasswordField fx:id="passwordRegField" layoutX="110.0" layoutY="122.0" onAction="#regButton" promptText="Пароль">
-         <font>
-            <Font size="15.0" />
-         </font></PasswordField>
-        <Label layoutX="126.0" layoutY="25.0" text="Регистрация">
-            <font>
-                <Font size="27.0" />
-            </font>
-        </Label>
-        <Button fx:id="registrationButton" layoutX="129.0" layoutY="174.0" mnemonicParsing="false" onAction="#regButton" prefHeight="25.0" prefWidth="149.0" text="Зарегистрироваться" />
-    </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="222.0"
+            prefWidth="406.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vorobev.client.application.controllers.RegistrationController">
+    <TextField fx:id="loginRegField" layoutX="110.0" layoutY="80.0" onAction="#regButton" promptText="Логин">
+        <font>
+        <Font size="15.0"/>
+        </font>
+    </TextField>
+    <PasswordField fx:id="passwordRegField" layoutX="110.0" layoutY="122.0" onAction="#regButton" promptText="Пароль">
+        <font>
+        <Font size="15.0"/>
+        </font>
+    </PasswordField>
+    <Label layoutX="126.0" layoutY="25.0" text="Регистрация">
+        <font>
+            <Font size="27.0"/>
+        </font>
+    </Label>
+    <Button fx:id="registrationButton" layoutX="129.0" layoutY="174.0" mnemonicParsing="false" onAction="#regButton"
+            prefHeight="25.0" prefWidth="149.0" text="Зарегистрироваться"/>
 </AnchorPane>
