@@ -57,7 +57,7 @@ public class ClientController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if(!Files.exists(homeDir)){
+        if (!Files.exists(homeDir)) {
             try {
                 Files.createDirectories(homeDir);
             } catch (IOException e) {
@@ -311,11 +311,15 @@ public class ClientController implements Initializable {
         try {
             if (newDirNameFieldClient.getText().isEmpty()) {
                 alertWindow("Введите название папки");
+            } else if (Files.exists(currentDir.resolve(newDirNameFieldClient.getText().trim()))) {
+                alertWindow("Такая папка уже существует");
             } else {
-                Files.createDirectories(currentDir.resolve(Path.of(newDirNameFieldServer.getText().trim())));
+                Files.createDirectories(currentDir.resolve(Path.of(newDirNameFieldClient.getText().trim())));
+                newDirNameFieldClient.clear();
                 getFileClient(currentDir);
                 openNewDirToolBarClient.setVisible(false);
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -327,6 +331,7 @@ public class ClientController implements Initializable {
                 alertWindow("Введите название папки");
             } else {
                 network.writeCommand(new CreateNewDir(newDirNameFieldServer.getText().trim()));
+                newDirNameFieldServer.clear();
                 openNewDirToolBarServer.setVisible(false);
             }
         } catch (IOException e) {
