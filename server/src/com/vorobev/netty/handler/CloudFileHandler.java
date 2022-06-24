@@ -79,8 +79,12 @@ public class CloudFileHandler extends SimpleChannelInboundHandler<CloudMessage> 
             }
         } else if (cloudMessage instanceof CreateNewDir) {
             CreateNewDir newDir = (CreateNewDir) cloudMessage;
-            Files.createDirectories(currentDir.resolve(newDir.getDirName()));
-            ctx.writeAndFlush(new ListFiles(currentDir));
+            if (Files.exists(currentDir.resolve(newDir.getDirName()))) {
+                ctx.writeAndFlush(new WarningServerClass("Такая папка уже существует"));
+            } else {
+                Files.createDirectories(currentDir.resolve(newDir.getDirName()));
+                ctx.writeAndFlush(new ListFiles(currentDir));
+            }
         }
     }
 }
